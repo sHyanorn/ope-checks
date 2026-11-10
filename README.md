@@ -116,3 +116,14 @@ These follow from the registered method and are visible in the result files.
 - A total variation distance between two resampled logs is biased upward, so an estimate of an H7 distance can lie below its own percentile interval. The distance of the hourly shares of rows is 0.0091 (0.0105 to 0.0129) on All and 0.0111 (0.0127 to 0.0159) on Women's.
 - A quantity that cannot be computed in a replicate is left out of its interval and counted under `undefined_replicates` (amendment 1).
 - A converted Parquet file found in the data directory is reused; delete it to convert again from the archive.
+
+### Figures
+
+`obd/figures/` holds three figures, each for a light and a dark page: the IPS ratio of H3 under three resampling units (post hoc), the registered IPS ratio of H3 and `rho` of H4 on the confirmatory campaigns, and the distances of H1. They are drawn from the result files in `obd/results/` and `obd/posthoc/results/`. To redraw them:
+
+```
+pip install -e ".[figures]"
+python -m obd.figures.make
+```
+
+Their test is skipped where matplotlib is not installed.
