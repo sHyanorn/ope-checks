@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ope-checks"
+version = "0.1.0"
+description = "Pre-registered checks of published off-policy evaluation results"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    # The registered random streams are those of this numpy line.
+    "numpy>=2.5,<2.6",
+    "pandas>=3.0",
+    "pyarrow>=21",
+    "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.9"]
+
+[tool.setuptools.packages.find]
+include = ["obd*"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "PLC", "PLE"]
