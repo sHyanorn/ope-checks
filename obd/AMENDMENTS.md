@@ -41,3 +41,10 @@
 - Text: Section 2 says "Three positions" and lists the conditions that stop the run of a campaign. A position value other than 1, 2 or 3 is not among them.
 - Change: the run of a campaign also stops if a row has a position other than 1, 2 or 3. It is checked with the other conditions, before any click is read.
 - Why: every estimator indexes positions 1 to 3; a file that breaks this cannot be analysed as registered.
+
+## 7. H7, values of a user feature that differ between the two files
+
+- Text: Section 7, H7 compares the distribution of each user feature and of their combinations in `R` and `B`, and weights rows of `R` by the shares of their combination in the two logs. It takes a value to be written the same way in both files.
+- Found on Men's, from the user feature columns only: in each feature exactly one value of `B` does not occur in `R` and exactly one value of `R` does not occur in `B`. They mark the same rows in all four features, 29.35% of `B` and 29.21% of `R`. Compared as written, the distance of every feature is 0.29; with the two values taken as one it is 0.001 to 0.003. The distances of Section 3 from 10,000 rows per log (0.006 to 0.018) are not reproduced when values are compared as written.
+- Reading: for each feature and campaign, if exactly one value occurs only in `R` and exactly one only in `B`, the two are treated as the same value. In every other case values are compared as written. The values matched and their shares of rows are reported, and the distances of H7 are also reported as written.
+- Why: the files hash the feature values, and the equal shares show one category hashed differently in the two files. That the two values are the same category is an inference from the shares; the files do not state it.
