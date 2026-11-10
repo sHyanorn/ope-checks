@@ -1,0 +1,102 @@
+{
+ "preregistration_commit": "08ab8da8301409b0ffd2eda8b646293c14d74af3",
+ "code_commit": "11e9340220a6abdd4ed0550800a32322344c0a99",
+ "numpy": "2.5.3",
+ "replicates": 10000,
+ "command": "python -m obd.run all women",
+ "weights": {
+  "all": 0.54,
+  "women": 0.46
+ },
+ "h3": {
+  "ips": {
+   "label": "no shortfall shown",
+   "campaigns_differ": false
+  },
+  "snips": {
+   "label": "no shortfall shown",
+   "campaigns_differ": false
+  }
+ },
+ "h4": {
+  "widths": {
+   "all": 3,
+   "women": 3
+  },
+  "alignment": {
+   "label": "raises the estimate",
+   "campaigns_differ": false
+  },
+  "level": {
+   "label": "not distinguishable from the on-policy value",
+   "campaigns_differ": false
+  },
+  "reading": "shortfall not established; gap not read"
+ },
+ "quantities": {
+  "h3.ips": {
+   "estimate": 0.9738085267091209,
+   "interval": [
+    0.9145581292503571,
+    1.035736950218458
+   ],
+   "undefined_replicates": 0
+  },
+  "h3.ips.all_minus_women": {
+   "estimate": -0.05674232887947017,
+   "interval": [
+    -0.179122204814522,
+    0.06644456904894933
+   ],
+   "undefined_replicates": 0
+  },
+  "h3.snips": {
+   "estimate": 0.9735604121206808,
+   "interval": [
+    0.9141713182387131,
+    1.035619638718097
+   ],
+   "undefined_replicates": 0
+  },
+  "h3.snips.all_minus_women": {
+   "estimate": -0.056421045247825874,
+   "interval": [
+    -0.17825124681743235,
+    0.06536833994660615
+   ],
+   "undefined_replicates": 0
+  },
+  "h4.rho": {
+   "estimate": 1.0454633869192667,
+   "interval": [
+    0.9781871099066419,
+    1.113516158826466
+   ],
+   "undefined_replicates": 0
+  },
+  "h4.rho.all_minus_women": {
+   "estimate": -0.031030155122413694,
+   "interval": [
+    -0.16941066120810958,
+    0.10028219597063455
+   ],
+   "undefined_replicates": 0
+  },
+  "h4.d": {
+   "estimate": 0.0716548602101457,
+   "interval": [
+    0.0019894858268805576,
+    0.13909605349759094
+   ],
+   "undefined_replicates": 0
+  },
+  "h4.d.all_minus_women": {
+   "estimate": 0.025712173757056478,
+   "interval": [
+    -0.11477419883492557,
+    0.15578964425634817
+   ],
+   "undefined_replicates": 0
+  }
+ }
+}
