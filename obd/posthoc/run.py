@@ -1,6 +1,6 @@
 """Run the post hoc analyses.
 
-    python -m obd.posthoc.run                    all three
+    python -m obd.posthoc.run                    all four
     python -m obd.posthoc.run units features     some of them
 
 Results go to obd/posthoc/results/<analysis>.json. The data directory is that of `obd.run`.
@@ -15,7 +15,8 @@ import numpy as np
 
 from obd import data
 from obd import estimators as est
-from obd.posthoc import features, propensities, units
+from obd.posthoc import blocks, features, propensities, units
+from obd.run import POOL
 
 HERE = Path(__file__).parent
 RESULTS = HERE / "results"
@@ -93,10 +94,28 @@ def propensity_identity(data_dir):
     }
 
 
+def block_lengths(data_dir):
+    by_unit = {}
+    for stream, campaign in enumerate(data.CAMPAIGNS):
+        random, bts = (load(data_dir, policy, campaign) for policy in ("random", "bts"))
+        pi0 = est.fixed_prior_target(*data.read_prior(data_dir, campaign), stream)
+        by_unit[campaign] = blocks.h3_by_length(random, bts, pi0)
+    by_unit["pooled"] = blocks.pooled(by_unit, POOL)
+    out = {unit: blocks.summarise(by_length) for unit, by_length in by_unit.items()}
+    for unit, by_length in out.items():
+        registered = json.loads((REGISTERED / f"{unit}.json").read_text())["quantities"]
+        at_ten = {f"h3.{name}": by_length[blocks.REGISTERED][name] for name in ("ips", "snips")}
+        moved = differing({name: registered[name] for name in at_ten}, at_ten)
+        if moved:
+            raise SystemExit(f"{unit}: differs from the registered result: {moved}")
+    return {"minutes": blocks.MINUTES, "weights": POOL} | out
+
+
 ANALYSES = {
     "units": resampling_units,
     "features": unmatched_features,
     "propensities": propensity_identity,
+    "blocks": block_lengths,
 }
 
 

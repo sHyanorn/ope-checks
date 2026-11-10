@@ -181,6 +181,7 @@ How it is read:
 | `units.py` | impressions, resampling by unit, list reuse, the variance ratio |
 | `features.py` | values that occur in one log only, the pairing, H7 from the registered code |
 | `propensities.py` | `S` by cell, `M` by bound and by day, the grid bias, low hours |
-| `run.py` | the three analyses on the full data, result files |
+| `blocks.py` | the ratios of H3 by block length |
+| `run.py` | the analyses on the full data, result files |
 
 The tests in `tests/` use hand-built and synthetic logs only.
