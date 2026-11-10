@@ -76,6 +76,14 @@ What the labels say and do not say:
 
 Development campaign (Men's, `obd/results/men.json`, from commit `581b29d`; enters no verdict): `D` 0.437 against `D0` 0.109; H2 `M` 1.005 (0.997 to 1.013) over 12 cells; IPS ratio 0.891 (0.790 to 1.005); `rho` 0.992 (0.853 to 1.114) and `d` 0.100 (-0.010 to 0.190) at 3 hours.
 
+### Post hoc analyses
+
+These were fixed after the results above were known. They are descriptive, give no verdict, and replace or reinterpret no registered label. Code, result files and full tables are in [`obd/posthoc/`](obd/posthoc/README.md); `python -m obd.posthoc.run` reruns them.
+
+- Resampling unit. On all three campaigns the standard deviation of the H3 ratios with ten-minute blocks is 1.31 to 1.47 times the one with rows or impressions as resampling units. On All and Women's the interval of each ratio contains 1 under all three units. On Men's the intervals from rows and from impressions lie below 1 and the one from blocks contains 1. On All and Women's 30% to 36% of complete impressions show the same list as the one before, as on Men's (31%, 37%).
+- The feature that amendment 7 left unmatched. On each confirmatory campaign the BTS log holds one more value of that feature that the random log lacks, on 30 rows (All) and 14 rows (Women's). The other value of each log sits on exactly the rows that the matched values of the other three features mark. With those two taken as one value, the joint distance of the user features is 0.007 (All) and 0.009 (Women's), and the change in `rho` under user weights is 0.001 (-0.003 to 0.005) and -0.001 (-0.014 to 0.005). The registered H7 numbers stand as registered.
+- H2. At the registered bound `M` is 0.027 (All) and 0.033 (Women's) below 1. The upward bias of `S` that Section 8 names is about +0.0002. Hours in which an eligible cell is shown at under a tenth of the rate its recorded propensities imply hold 0.033 of that distance on All and 0.022 on Women's, against 0.002 on Men's, where `M` is 1.005. On All and Women's nearly all of it falls on 27 and 29 November, the two days on which `M` is below 1 with an interval that excludes 1; on the other five days the interval contains 1. Such hours are what the downward bias of Section 8 would leave. The logs do not show what was served in them, and the cause is not identified.
+
 ### Reproduce
 
 ```

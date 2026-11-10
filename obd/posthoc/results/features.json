@@ -1,0 +1,479 @@
+{
+ "post_hoc": true,
+ "code_commit": "41969f31f477d8aee3712563bdc5ea7d0ff92676",
+ "numpy": "2.5.4",
+ "replicates": 10000,
+ "command": "python -m obd.posthoc.run",
+ "all": {
+  "matched_features": [
+   "user_feature_0",
+   "user_feature_1",
+   "user_feature_3"
+  ],
+  "rows_marked": {
+   "random": 485993,
+   "bts": 4362623
+  },
+  "values": {
+   "user_feature_0": [
+    {
+     "log": "random",
+     "value": "574464659df0fc5bac579eff2b1fff99",
+     "rows": 485993,
+     "share_of_rows": 0.3536225367034192,
+     "rows_marked": 485993
+    },
+    {
+     "log": "bts",
+     "value": "8ca3f3c62ebdd4b5e311d475c6d5ca2f",
+     "rows": 4362623,
+     "share_of_rows": 0.35304300326934906,
+     "rows_marked": 4362623
+    }
+   ],
+   "user_feature_1": [
+    {
+     "log": "random",
+     "value": "a05b66683c9a38a761122e14ef9a0f6c",
+     "rows": 485993,
+     "share_of_rows": 0.3536225367034192,
+     "rows_marked": 485993
+    },
+    {
+     "log": "bts",
+     "value": "e07fc4436e7c7833115dbfc8ff770109",
+     "rows": 4362623,
+     "share_of_rows": 0.35304300326934906,
+     "rows_marked": 4362623
+    }
+   ],
+   "user_feature_2": [
+    {
+     "log": "random",
+     "value": "3a845d98884c222862996aadd75584c5",
+     "rows": 485993,
+     "share_of_rows": 0.3536225367034192,
+     "rows_marked": 485993
+    },
+    {
+     "log": "bts",
+     "value": "1e58eb4fb1a017cf89826db60ffb7d67",
+     "rows": 4362623,
+     "share_of_rows": 0.35304300326934906,
+     "rows_marked": 4362623
+    },
+    {
+     "log": "bts",
+     "value": "77fecf8cfc9c3057ced84bd867c0800c",
+     "rows": 30,
+     "share_of_rows": 2.427734438222251e-06,
+     "rows_marked": 0
+    }
+   ],
+   "user_feature_3": [
+    {
+     "log": "random",
+     "value": "397559c512c5db37e09011ba61bcc333",
+     "rows": 485993,
+     "share_of_rows": 0.3536225367034192,
+     "rows_marked": 485993
+    },
+    {
+     "log": "bts",
+     "value": "fe64471cf5b19278c62ce48447f9264d",
+     "rows": 4362623,
+     "share_of_rows": 0.35304300326934906,
+     "rows_marked": 4362623
+    }
+   ]
+  },
+  "taken_as_one_value": {
+   "user_feature_2": {
+    "random": "3a845d98884c222862996aadd75584c5",
+    "bts": "1e58eb4fb1a017cf89826db60ffb7d67"
+   }
+  },
+  "h7": {
+   "h7.tv.feature_0": {
+    "registered": {
+     "estimate": 0.0012061669085482725,
+     "interval": [
+      0.00032376145162588176,
+      0.00288283755916032
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0012061669085482443,
+     "interval": [
+      0.00032376145162588176,
+      0.00288283755916032
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.feature_1": {
+    "registered": {
+     "estimate": 0.0014513928548190742,
+     "interval": [
+      0.0005795534187563311,
+      0.0031508336124962655
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0014513928548190386,
+     "interval": [
+      0.0005795534187563311,
+      0.0031508336124962655
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.feature_2": {
+    "registered": {
+     "estimate": 0.35492635262776906,
+     "interval": [
+      0.35237361308544957,
+      0.3581487364622119
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0018833493584199384,
+     "interval": [
+      0.0012303565734077349,
+      0.003689355034163863
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.feature_3": {
+    "registered": {
+     "estimate": 0.0015785483063352498,
+     "interval": [
+      0.000922522231676625,
+      0.0034050219539287054
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0015785483063352071,
+     "interval": [
+      0.0009225222316766243,
+      0.0034050219539287054
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.joint": {
+    "registered": {
+     "estimate": 0.3598642102124582,
+     "interval": [
+      0.35938202020459925,
+      0.3650511377028605
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.006821206943109077,
+     "interval": [
+      0.008236554757345265,
+      0.01062786967066165
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.hours": {
+    "registered": {
+     "estimate": 0.009148789868479033,
+     "interval": [
+      0.010544557574772078,
+      0.012936058995861891
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.009148789868479033,
+     "interval": [
+      0.010544557574772078,
+      0.012936058995861891
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.absent": {
+    "registered": {
+     "estimate": 0.35313695659210825,
+     "interval": [
+      0.3504879315565044,
+      0.3557398721484143
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 9.39533227592011e-05,
+     "interval": [
+      0.00012681344354527642,
+      0.00020952046337903446
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.rho_change": {
+    "registered": {
+     "estimate": -0.058458786390596096,
+     "interval": [
+      -0.13601840009192132,
+      0.013008839120725781
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0005676271911367881,
+     "interval": [
+      -0.003415206511316715,
+      0.004522712759511244
+     ],
+     "undefined_replicates": 0
+    }
+   }
+  }
+ },
+ "women": {
+  "matched_features": [
+   "user_feature_0",
+   "user_feature_1",
+   "user_feature_2"
+  ],
+  "rows_marked": {
+   "random": 195980,
+   "bts": 1771203
+  },
+  "values": {
+   "user_feature_0": [
+    {
+     "log": "random",
+     "value": "36b7df2a80cda85bb6f0803e3907bdc7",
+     "rows": 195980,
+     "share_of_rows": 0.22667522568631193,
+     "rows_marked": 195980
+    },
+    {
+     "log": "bts",
+     "value": "75b4314cd03f3a7e09ddf995470d8f2d",
+     "rows": 1771203,
+     "share_of_rows": 0.22808623839530168,
+     "rows_marked": 1771203
+    }
+   ],
+   "user_feature_1": [
+    {
+     "log": "random",
+     "value": "69df0a7fb6c309379eb6f0abb8313c0b",
+     "rows": 195980,
+     "share_of_rows": 0.22667522568631193,
+     "rows_marked": 195980
+    },
+    {
+     "log": "bts",
+     "value": "51edd7cfacfbd846db795e44ec128762",
+     "rows": 1771203,
+     "share_of_rows": 0.22808623839530168,
+     "rows_marked": 1771203
+    }
+   ],
+   "user_feature_2": [
+    {
+     "log": "random",
+     "value": "11629cac43099ea8bd37dd125aeaefa7",
+     "rows": 195980,
+     "share_of_rows": 0.22667522568631193,
+     "rows_marked": 195980
+    },
+    {
+     "log": "bts",
+     "value": "903bae64645d46fb8fc2168aec6af9bf",
+     "rows": 1771203,
+     "share_of_rows": 0.22808623839530168,
+     "rows_marked": 1771203
+    }
+   ],
+   "user_feature_3": [
+    {
+     "log": "random",
+     "value": "9eb4f4712bf533a8bff3cede17220334",
+     "rows": 195980,
+     "share_of_rows": 0.22667522568631193,
+     "rows_marked": 195980
+    },
+    {
+     "log": "bts",
+     "value": "c9dce82be9faf60d0b76e3e1eaaf835d",
+     "rows": 14,
+     "share_of_rows": 1.8028466175442474e-06,
+     "rows_marked": 0
+    },
+    {
+     "log": "bts",
+     "value": "f97fde0df02bbb0a100653eba7550cd7",
+     "rows": 1771203,
+     "share_of_rows": 0.22808623839530168,
+     "rows_marked": 1771203
+    }
+   ]
+  },
+  "taken_as_one_value": {
+   "user_feature_3": {
+    "random": "9eb4f4712bf533a8bff3cede17220334",
+    "bts": "f97fde0df02bbb0a100653eba7550cd7"
+   }
+  },
+  "h7": {
+   "h7.tv.feature_0": {
+    "registered": {
+     "estimate": 0.001411012708990332,
+     "interval": [
+      0.0003049776874399132,
+      0.0032772135333676558
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.001411012708990332,
+     "interval": [
+      0.0003049776874398282,
+      0.0032772135333676558
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.feature_1": {
+    "registered": {
+     "estimate": 0.0014210685115732284,
+     "interval": [
+      0.0006090403597665744,
+      0.0033515137058292305
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0014210685115732284,
+     "interval": [
+      0.0006090403597665744,
+      0.0033515137058292305
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.feature_2": {
+    "registered": {
+     "estimate": 0.0030706308632500127,
+     "interval": [
+      0.0019043153073650264,
+      0.005312276052470958
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0030706308632500127,
+     "interval": [
+      0.0019043153073650264,
+      0.005312276052470958
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.feature_3": {
+    "registered": {
+     "estimate": 0.2281768406584357,
+     "interval": [
+      0.2269027449109175,
+      0.23139730334355776
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.0015016149721237676,
+     "interval": [
+      0.0011692988516361106,
+      0.00400267354932759
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.joint": {
+    "registered": {
+     "estimate": 0.23582628938720956,
+     "interval": [
+      0.23607708830950835,
+      0.24093153496573144
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.009151063700897664,
+     "interval": [
+      0.010244194094276956,
+      0.01350948178949105
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.tv.hours": {
+    "registered": {
+     "estimate": 0.011066182912933424,
+     "interval": [
+      0.012711471818951383,
+      0.015924472476144775
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.011066182912933424,
+     "interval": [
+      0.012711471818951383,
+      0.015924472476144775
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.absent": {
+    "registered": {
+     "estimate": 0.22822995102567165,
+     "interval": [
+      0.22645675077440056,
+      0.23021574015665944
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": 0.00014371263036995572,
+     "interval": [
+      0.0002061261822083979,
+      0.00033630001994336314
+     ],
+     "undefined_replicates": 0
+    }
+   },
+   "h7.rho_change": {
+    "registered": {
+     "estimate": -0.11583805704751626,
+     "interval": [
+      -0.17759970962285185,
+      -0.06321221055582395
+     ],
+     "undefined_replicates": 0
+    },
+    "post_hoc": {
+     "estimate": -0.001253470830510084,
+     "interval": [
+      -0.014276689508504636,
+      0.004541412164344629
+     ],
+     "undefined_replicates": 0
+    }
+   }
+  }
+ }
+}
