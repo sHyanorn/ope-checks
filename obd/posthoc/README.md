@@ -156,6 +156,24 @@ The eligible cells of the confirmatory campaigns at the registered bound. A low 
 - The pattern is weaker at the lower bounds (`m_by_day` in `results/propensities.json`). At 0.0005 Women's keeps both days and adds 30 November, while on All 27 November is at 1.000 and the only day whose interval excludes 1 is 25 November. At 0.0001 29 November is the lowest day on All and on Women's, and on Men's the lowest day is 24 November.
 - The days were looked at after the results were known, and 63 daily intervals were computed, 21 of them in the table, without any allowance for their number. The table says where in the week the registered `M` falls short. It does not say why.
 
+## 4. Interval width and the block length
+
+The lengths, the random stream and the reading below were committed before this analysis was run; the commit that added them holds no result of it.
+
+The registration resamples ten-minute blocks and says that the width of the intervals is the same for blocks of 5 to 60 minutes. That was measured on the fixed-prior ratios of Men's only, with 1,000 replicates of another random stream (Sections 3 and 8). Here the two ratios of H3 get an interval with clock blocks of 5, 10, 20, 30, 60 and 180 minutes as resampling units, on every campaign and on the pooled unit of Section 4 of the registration.
+
+- A block of `L` minutes is the UTC clock interval of `L` minutes that contains the timestamp, counted from the start of the week. The week holds 2,016, 1,008, 504, 336, 168 and 56 of them.
+- As in the registered bootstrap, a replicate draws as many blocks as the week holds, with replacement, a block carries the rows of both logs that fall in it, and the same blocks are drawn on every campaign. `pi0` stays as computed on the full data. Intervals are 2.5th and 97.5th percentiles of 10,000 replicates.
+- At ten minutes the multiplicities are the registered ones, and the run stops if an interval differs from the registered one. At every other length the multiplicities of replicate `i` are `numpy.random.default_rng([20261110, 3, L, i]).multinomial(n, numpy.full(n, 1 / n))`, with `n` the number of blocks.
+- Reported for each campaign, ratio and length: the interval, the standard deviation of the replicates, and that standard deviation over the one at ten minutes. The pooled unit is `0.54 x (All) + 0.46 x (Women's)`, computed within each replicate.
+
+How it is read:
+
+- It is descriptive. It gives no verdict and changes no registered label.
+- Two things are stated from the table for each unit: the lengths at which the interval contains 1, and the range of the standard deviation over the one at ten minutes.
+- The standard deviation of 10,000 replicates carries a Monte Carlo error of about 0.7% of its value (normal approximation), and the ratio of two of them about 1%. Lengths whose standard deviations differ by under 2% are not told apart.
+- A standard deviation that grows with the length would point to dependence between rows, or to change over the week, that reaches beyond ten minutes. This analysis does not separate the two (Section 8 of the registration). At 180 minutes an interval rests on 56 resampling units.
+
 ## Code
 
 | File | Content |
