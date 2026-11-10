@@ -48,3 +48,11 @@
 - Found on Men's, from the user feature columns only: in each feature exactly one value of `B` does not occur in `R` and exactly one value of `R` does not occur in `B`. They mark the same rows in all four features, 29.35% of `B` and 29.21% of `R`. Compared as written, the distance of every feature is 0.29; with the two values taken as one it is 0.001 to 0.003. The distances of Section 3 from 10,000 rows per log (0.006 to 0.018) are not reproduced when values are compared as written.
 - Reading: for each feature and campaign, if exactly one value occurs only in `R` and exactly one only in `B`, the two are treated as the same value. In every other case values are compared as written. The values matched and their shares of rows are reported, and the distances of H7 are also reported as written.
 - Why: the files hash the feature values, and the equal shares show one category hashed differently in the two files. That the two values are the same category is an inference from the shares; the files do not state it.
+
+## Interrupted run
+
+A record of an event, not a reading of the registration.
+
+- On 2026-11-10 at 11:10 UTC the confirmatory command `python -m obd.run all women` was started at commit `11e9340`. At about 11:28 UTC the host restarted and the process was gone. The checks of Section 2 had passed and the two logs of All had been converted to Parquet (11:12 UTC); the run was building the tables of All or resampling them. The logs of Women's had not been converted.
+- No result file had been written, the log was empty, and no statistic of a confirmatory campaign had been printed or seen.
+- The two Parquet files of All were deleted and the same command was run again at the same commit, from 11:31 to 11:44 UTC. It is the only run that completed, and the results in `obd/results/` are its output.

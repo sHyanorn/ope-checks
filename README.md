@@ -12,6 +12,70 @@ The standard benchmark on the [Open Bandit Dataset](https://research.zozo.com/da
 
 Men's is the development campaign; its results enter no verdict. All and Women's are the confirmatory campaigns.
 
+### Results
+
+Every number below comes from one run of commit `11e9340` (`python -m obd.run all women`, numpy 2.5.3) and is stored in `obd/results/` as written by that run (commit `d6a1594`). Intervals are the 2.5th and 97.5th percentiles of 10,000 replicates that resample ten-minute blocks. A first attempt at the run was cut off by a host restart before it produced any output; see "Interrupted run" in [`obd/AMENDMENTS.md`](obd/AMENDMENTS.md).
+
+| | All | Women's | Pooled (0.54, 0.46) |
+|---|---|---|---|
+| Items; rows of the random and BTS logs | 80; 1,374,327 and 12,357,200 | 46; 864,585 and 7,765,497 | |
+| On-policy click rate of BTS | 0.004953 (0.004876 to 0.005032) | 0.006379 (0.006271 to 0.006486) | |
+| **H1** `D`; noise floor `D0` | 0.526; 0.136 | 0.527; 0.115 | |
+| H1 label | inconsistent | inconsistent | |
+| **H2** eligible cells; with 1 in their interval | 3; 1 | 7; 4 | |
+| H2 mean `M` of `S` | 0.973 (0.957 to 0.990) | 0.967 (0.955 to 0.980) | |
+| H2 label | undetermined | undetermined | |
+| **H3** IPS over on-policy | 0.948 (0.867 to 1.033) | 1.004 (0.917 to 1.099) | 0.974 (0.915 to 1.036) |
+| H3 IPS label | no shortfall shown | no shortfall shown | no shortfall shown |
+| H3 SNIPS over on-policy | 0.948 (0.867 to 1.032) | 1.004 (0.917 to 1.099) | 0.974 (0.914 to 1.036) |
+| H3 SNIPS label | no shortfall shown | no shortfall shown | no shortfall shown |
+| **H4** width used; coverage `C(W)` there | 3 hours; 0.9985 | 3 hours; 0.9992 | 3 and 3 hours |
+| H4 `rho` | 1.031 (0.932 to 1.128) | 1.062 (0.974 to 1.158) | 1.045 (0.978 to 1.114) |
+| H4 level | not distinguishable from the on-policy value | not distinguishable from the on-policy value | not distinguishable from the on-policy value |
+| H4 `d` = `rho` - IPS ratio | 0.083 (-0.019 to 0.182) | 0.058 (-0.031 to 0.147) | 0.072 (0.002 to 0.139) |
+| H4 alignment | no change shown | no change shown | raises the estimate |
+| H4 reading | shortfall not established; gap not read | shortfall not established; gap not read | shortfall not established; gap not read |
+| **H5** hour after minus hour before | 0.099 (0.033 to 0.166) | 0.076 (0.022 to 0.130) | |
+| H5 label | frequencies after a row are associated with clicks in the random log | frequencies after a row are associated with clicks in the random log | |
+| **H6** IPS of the uniform policy over the random log's click rate | 0.990 (0.918 to 1.070), consistent | 0.956 (0.897 to 1.019), consistent | |
+| H6 SNIPS | 0.950 (0.855 to 1.050), consistent | 0.920 (0.819 to 1.014), consistent | |
+
+No pooled label carries the flag "campaigns differ". No quantity was undefined in any replicate.
+
+H4 at every width, each with the fallback applied from that width, and the two IPS forms of the aligned target:
+
+| | All | Women's |
+|---|---|---|
+| `rho`, 1 h | 1.016 (0.911 to 1.106) | 1.083 (0.980 to 1.190) |
+| `rho`, 3 h | 1.031 (0.932 to 1.128) | 1.062 (0.974 to 1.158) |
+| `rho`, 6 h | 1.028 (0.935 to 1.117) | 1.058 (0.972 to 1.147) |
+| `rho`, 24 h | 1.017 (0.944 to 1.091) | 1.018 (0.945 to 1.093) |
+| `d`, 1 h | 0.068 (-0.046 to 0.163) | 0.079 (-0.028 to 0.178) |
+| `d`, 3 h | 0.083 (-0.019 to 0.182) | 0.058 (-0.031 to 0.147) |
+| `d`, 6 h | 0.080 (-0.016 to 0.168) | 0.053 (-0.030 to 0.133) |
+| `d`, 24 h | 0.069 (-0.006 to 0.142) | 0.013 (-0.057 to 0.081) |
+| `rho` - SNIPS ratio, 1 h | 0.068 (-0.045 to 0.163) | 0.079 (-0.027 to 0.179) |
+| `rho` - SNIPS ratio, 3 h | 0.084 (-0.019 to 0.182) | 0.058 (-0.029 to 0.147) |
+| `rho` - SNIPS ratio, 6 h | 0.080 (-0.014 to 0.167) | 0.053 (-0.028 to 0.134) |
+| `rho` - SNIPS ratio, 24 h | 0.069 (-0.004 to 0.141) | 0.014 (-0.055 to 0.079) |
+| IPS form at the width used | 1.047 (0.948 to 1.152) | 1.093 (1.001 to 1.194) |
+| IPS with whole-week BTS frequencies | 1.017 (0.949 to 1.087) | 1.006 (0.939 to 1.077) |
+| BTS rows resolved by fallback at the width used: full data; mean over replicates | 0.0015; 0.0049 | 0.0008; 0.0033 |
+| BTS rows dropped | 0.0000 | 0.0000 |
+
+What the labels say and do not say:
+
+- H1: on both campaigns `D` exceeds 0.10 and twice `D0`. The distance of the first hour of the week by position is 0.180, 0.126, 0.088 (All); 0.164, 0.098, 0.105 (Women's).
+- H2: undetermined on both campaigns. All has 3 eligible cells, fewer than the five the rule needs. On Women's `M` lies outside [0.98, 1.02] and inside [0.95, 1.05], and 4 of 7 cell intervals contain 1. `M` is below 1 on both; Section 8 of the registration lists a downward bias of `S` in eligible cells.
+- H3: no shortfall is shown in any confirmatory unit, as the registration expected. On the development campaign the IPS ratio is 0.891 (0.790 to 1.005): Section 3 of the registration quotes 0.791 to 0.994 from 1,000 replicates of another random stream; the registered stream and 10,000 replicates put the upper end above 1.
+- H4: because H3 found no shortfall, the gap is not read in any unit. The aligned estimate is not distinguishable from the on-policy value in any unit. The paired change from the fixed-prior IPS is positive in every unit and at every width; its interval excludes 0 only in the pooled unit.
+- H5: on both campaigns the target built from the hour after a row gives a higher estimate than the one built from the hour before. The registration calls this descriptive: it cannot separate BTS learning from clicks of the random bucket from demand shared by both buckets. Ratios to the on-policy value, fifteen minutes before, hour before, hour after: 1.004, 1.002, 1.101 (All); 1.068, 1.036, 1.124 (Women's).
+- H6: estimating the uniform policy from the BTS log with its recorded propensities is consistent with the random log's click rate for both estimators on both campaigns. Kish's effective sample size is 19,910 and 6,009; rows with a propensity below 0.001 carry 39% and 29% of the weight.
+- H7 has no rule. Amendment 7 matched the value written differently in the two files for three of the four user features on each campaign; feature 2 on All and feature 3 on Women's did not meet its condition and are compared as written. On these two campaigns the joint distance (0.360, 0.236), the share of BTS rows whose combination is absent from the random log (0.353, 0.228) and the change in `rho` under user weights (-0.058 (-0.136 to 0.013), -0.116 (-0.178 to -0.063)) therefore still contain the difference in how the files write that value. They cannot be read as a difference in the users of the two logs. The distances of the three matched features are 0.001, 0.001, 0.002 (All); 0.001, 0.001, 0.003 (Women's). On Men's all four features were matched and the change in `rho` is -0.001 (-0.007 to 0.004). The distances that Section 3 of the registration reports from 10,000 rows per log (0.006 to 0.018) are not reproduced when values are compared as written.
+- Exploratory item, no verdict: -0.013 (-0.092 to 0.063) on All and 0.050 (-0.033 to 0.132) on Women's.
+
+Development campaign (Men's, `obd/results/men.json`, from commit `581b29d`; enters no verdict): `D` 0.437 against `D0` 0.109; H2 `M` 1.005 (0.997 to 1.013) over 12 cells; IPS ratio 0.891 (0.790 to 1.005); `rho` 0.992 (0.853 to 1.114) and `d` 0.100 (-0.010 to 0.190) at 3 hours.
+
 ### Reproduce
 
 ```
@@ -40,7 +104,7 @@ A bootstrap replicate rescales the block tables by the multiplicities of the blo
 
 These follow from the registered method and are visible in the result files.
 
-- Resampled counts fall below the minimum cell count more often than the full-data counts, so the replicates of H4 use more fallback than the estimate they surround (Section 8 of the registration). The same holds for the fifteen-minute window of H5: a window is empty in a replicate when its blocks are not drawn, which leaves out about a tenth of the random rows there against 0.1% on the full data of Men's.
-- A total variation distance between two resampled logs is biased upward, so the estimates of the H7 distances can lie below their own percentile intervals.
+- Resampled counts fall below the minimum cell count more often than the full-data counts, so the replicates of H4 use more fallback than the estimate they surround (Section 8 of the registration; the table above gives both shares). The same holds for the fifteen-minute window of H5: a window is empty in a replicate when its blocks are not drawn. On All it leaves out 0.16% of the random rows on the full data and 8.6% to 14.6% in replicates; on Women's 0.15% and 8.5% to 14.6%. That estimate enters no rule.
+- A total variation distance between two resampled logs is biased upward, so an estimate of an H7 distance can lie below its own percentile interval. The distance of the hourly shares of rows is 0.0091 (0.0105 to 0.0129) on All and 0.0111 (0.0127 to 0.0159) on Women's.
 - A quantity that cannot be computed in a replicate is left out of its interval and counted under `undefined_replicates` (amendment 1).
 - A converted Parquet file found in the data directory is reused; delete it to convert again from the archive.
