@@ -41,6 +41,11 @@ def test_no_pair_when_two_values_share_the_marked_rows():
     assert features.same_category(found) == {}
 
 
+def test_no_pair_when_a_value_holds_only_part_of_the_marked_rows():
+    found = features.one_log_values(RANDOM, users("yq", "yc", "ac"))
+    assert features.same_category(found) == {}
+
+
 def test_no_pair_when_a_value_also_holds_unmarked_rows():
     found = features.one_log_values(RANDOM, users("yq", "yq", "aq"))
     assert features.same_category(found) == {}

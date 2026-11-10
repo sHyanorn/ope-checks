@@ -57,18 +57,7 @@ def unmatched_features(data_dir):
             *data.read_prior(data_dir, campaign),
             data.CAMPAIGNS.index(campaign),
         )
-        moved = [
-            name
-            for name in registered
-            if not name.startswith("h7.")
-            and not np.allclose(
-                [post_hoc[name]["estimate"], *post_hoc[name]["interval"]],
-                [registered[name]["estimate"], *registered[name]["interval"]],
-                rtol=1e-9,
-                atol=0,
-                equal_nan=True,
-            )
-        ]
+        moved = differing(registered, post_hoc)
         if moved:  # only H7 reads the user features
             raise SystemExit(f"{campaign}: differs from the registered result: {moved}")
         out[campaign]["h7"] = {
@@ -77,6 +66,22 @@ def unmatched_features(data_dir):
             if name.startswith("h7.")
         }
     return out
+
+
+def differing(registered, post_hoc):
+    """The quantities outside H7 whose estimate or interval is not the registered one."""
+    return [
+        name
+        for name in registered
+        if not name.startswith("h7.")
+        and not np.allclose(
+            [post_hoc[name]["estimate"], *post_hoc[name]["interval"]],
+            [registered[name]["estimate"], *registered[name]["interval"]],
+            rtol=1e-9,
+            atol=0,
+            equal_nan=True,
+        )
+    ]
 
 
 def propensity_identity(data_dir):
@@ -102,7 +107,7 @@ def _code_commit():
         done = subprocess.run(["git", *args], cwd=HERE, capture_output=True, text=True, check=True)
         return done.stdout.strip()
 
-    changed = git("status", "--porcelain", "--", "..", ":(exclude)results", ":(exclude)../results")
+    changed = git("status", "--porcelain", "--", ":(glob)../**/*.py")
     return git("rev-parse", "HEAD") + ("-dirty" if changed else "")
 
 

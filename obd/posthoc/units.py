@@ -122,7 +122,7 @@ def list_reuse(log, impression):
     }
 
 
-def variance_ratio(start, clicks, rows, minutes):
+def variance_ratio(start, clicks, rows, minutes, small_sample=True):
     """Variance of the difference in click rate between adjacent time blocks, over the
     variance it would have if impressions were independent.
 
@@ -132,26 +132,35 @@ def variance_ratio(start, clicks, rows, minutes):
     without overlap: the first with the second, the third with the fourth. The
     numerator sums the squared difference of the two click rates over the pairs.
     The denominator sums, over the same pairs, the two blocks' variance of a click
-    rate with impressions as independent clusters: the sum over the impressions of
-    a block of (clicks - rate x rows) squared, over the squared rows of the block.
-    A pair with an empty block is left out.
+    rate with impressions as independent clusters: for a block of G impressions,
+    G / (G - 1) times the sum over them of (clicks - rate x rows) squared, over
+    the squared rows of the block. A pair with a block of fewer than two
+    impressions is left out.
+
+    Without `small_sample` the factor G / (G - 1) is dropped and only pairs with
+    an empty block are left out. That ratio exceeds 1 for independent impressions
+    when blocks hold few of them.
     """
     block = start // (minutes * MINUTE_US)
     n_blocks = N_BLOCKS * 10 // minutes
+    g = np.bincount(block, minlength=n_blocks)
     n, total = np.bincount(block, rows, n_blocks), np.bincount(block, clicks, n_blocks)
-    with np.errstate(invalid="ignore"):
+    with np.errstate(invalid="ignore", divide="ignore"):
         rate = total / n
         variance = np.bincount(block, (clicks - rate[block] * rows) ** 2, n_blocks) / n**2
+        if small_sample:
+            variance *= g / (g - 1)
     rate, variance = (x.reshape(-1, 2) for x in (rate, variance))
-    kept = (n.reshape(-1, 2) > 0).all(axis=1)
+    kept = (g.reshape(-1, 2) >= (2 if small_sample else 1)).all(axis=1)
     return float(((rate[kept, 0] - rate[kept, 1]) ** 2).sum() / variance[kept].sum())
 
 
 def dependence(log):
     """List reuse and the variance ratios of one log.
 
-    The variance ratio is given for the clicks and for the clicks minus the
-    click rate of their (item, position) in the log.
+    The variance ratio is given for the clicks, for the clicks minus the click
+    rate of their (item, position) in the log, and for the clicks without the
+    small-sample factor.
     """
     impression = impressions(log)
     n = impression.max() + 1
@@ -162,11 +171,13 @@ def dependence(log):
     with np.errstate(invalid="ignore"):  # cells without rows are not looked up
         residual = click - (np.bincount(cell, click) / np.bincount(cell))[cell]
     rows = np.bincount(impression)
+    clicks, residuals = np.bincount(impression, click), np.bincount(impression, residual)
     return list_reuse(log, impression) | {
         "variance_ratio": {
             minutes: {
-                name: variance_ratio(start, np.bincount(impression, x), rows, minutes)
-                for name, x in (("clicks", click), ("residuals", residual))
+                "clicks": variance_ratio(start, clicks, rows, minutes),
+                "residuals": variance_ratio(start, residuals, rows, minutes),
+                "clicks_without_factor": variance_ratio(start, clicks, rows, minutes, False),
             }
             for minutes in BLOCK_MINUTES
         }

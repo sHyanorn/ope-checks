@@ -9,6 +9,7 @@ from obd.data import BLOCK_US, N_BLOCKS, WEEK_START_US
 BOUNDS = (0.001, 0.0005, 0.0001)  # the registered bound of H2 and two lower ones
 GRID = 200_000  # recorded propensities are multiples of 1 / GRID
 DAYS = 7
+LOW = (0.1, 0.5)  # hourly S under which a cell counts as nearly missing from the hour
 
 
 def cell_sums(bts, n_items):
@@ -55,16 +56,30 @@ def mean_s(inv_p, rows, cells, multiplicities, blocks=slice(None)):
     return run.summarise(estimate, replicates)
 
 
-def absent(rows):
-    """By cell, the share of its position's rows that fall in hours without a row of the cell."""
-    hourly = rows.reshape(-1, 6, *rows.shape[1:]).sum(axis=1)
-    by_position = hourly.sum(axis=1, keepdims=True)
+def hourly(x):
+    """[block, ...] to [hour, ...]."""
+    return x.reshape(-1, 6, *x.shape[1:]).sum(axis=1)
+
+
+def low_hours(inv_p, rows, below):
+    """The hours in which a cell is shown far less often than its recorded propensities imply.
+
+    From sums by [hour, item, position]. The hourly S of a cell is its sum of
+    1/propensity in the hour over the rows of its position in the hour. Returns,
+    by [hour, item, position], whether it is under `below`, and the part of
+    1 - S that the hour then accounts for: its share of the position's rows
+    times (1 - hourly S).
+    """
+    by_position = rows.sum(axis=1, keepdims=True)
     with np.errstate(invalid="ignore"):  # undefined for a position without rows
-        return ((hourly == 0) * by_position).sum(axis=0) / by_position.sum(axis=0)
+        s = inv_p / by_position
+        low = s < below
+        shortfall = np.where(low, by_position / by_position.sum(axis=0) * (1 - s), 0.0)
+    return low, shortfall
 
 
 def analyse(bts, n_items, n_replicates=est.N_REPLICATES):
-    """S by cell, and M with the two biases of Section 8 at each eligibility bound.
+    """S by cell, and M with rough sizes of the two biases of Section 8 at each bound.
 
     Intervals come from the registered multiplicities of the ten-minute blocks.
     """
@@ -72,11 +87,26 @@ def analyse(bts, n_items, n_replicates=est.N_REPLICATES):
     rows, inv_p, min_p = sums["rows"], sums["inv_p"], sums["min_p"]
     multiplicities = np.array([est.multiplicities(i) for i in range(n_replicates)])
     s = statistic(inv_p, rows, np.ones((1, N_BLOCKS)))[0]
-    gone = absent(rows)
+    hourly_rows, hourly_inv_p = hourly(rows), hourly(inv_p)
+    lows = {below: low_hours(hourly_inv_p, hourly_rows, below) for below in LOW}
+    day = N_BLOCKS // DAYS
+
+    def in_low_hours(item, k, below):
+        hours = lows[below][0][:, item, k]
+        cell_rows = hourly_rows[hours, item, k].sum()
+        return {
+            "hours": int(hours.sum()),
+            "rows": int(cell_rows),
+            "rows_of_position": int(hourly_rows[hours, :, k].sum()),
+            "harmonic_mean_propensity": float(cell_rows / hourly_inv_p[hours, item, k].sum())
+            if cell_rows
+            else None,
+            "shortfall": float(lows[below][1][:, item, k].sum()),
+        }
+
     by_bound = {}
     for bound in BOUNDS:
         cells = np.isfinite(min_p) & (min_p >= bound)
-        day = N_BLOCKS // DAYS
         by_bound[bound] = {
             "cells": int(cells.sum()),
             "share_of_rows": float(rows.sum(axis=0)[cells].sum() / rows.sum()),
@@ -86,7 +116,17 @@ def analyse(bts, n_items, n_replicates=est.N_REPLICATES):
                 for d in range(DAYS)
             ],
             "grid_bias": float(sums["grid_bias"][cells].mean()),
-            "absent": float(gone[cells].mean()),
+            "shortfall_in_low_hours": {
+                below: {
+                    "mean": float(shortfall[:, cells].sum(axis=0).mean()),
+                    "by_day": shortfall[:, cells]
+                    .reshape(DAYS, 24, -1)
+                    .sum(axis=1)
+                    .mean(axis=1)
+                    .tolist(),
+                }
+                for below, (_, shortfall) in lows.items()
+            },
         }
     return {
         "by_bound": by_bound,
@@ -98,7 +138,7 @@ def analyse(bts, n_items, n_replicates=est.N_REPLICATES):
                 "min_propensity": float(min_p[item, k]),
                 "s": float(s[item, k]),
                 "grid_bias": float(sums["grid_bias"][item, k]),
-                "absent": float(gone[item, k]),
+                "low_hours": {below: in_low_hours(item, k, below) for below in LOW},
             }
             for item, k in zip(*np.nonzero(np.isfinite(min_p) & (min_p >= BOUNDS[-1])), strict=True)
         ],

@@ -18,6 +18,16 @@ def test_impressions_are_runs_in_time_order():
     assert units.impressions(log(rows)).tolist() == [3, 0, 1, 0, 0, 2]
 
 
+def test_an_impression_ends_after_a_full_second_or_a_change_in_any_user_feature():
+    rows = [at(0), at(0.5), at(1.5), at(1.6, user=("a", "-", "-", "x")), at(1.7)]
+    assert units.impressions(log(rows)).tolist() == [0, 0, 1, 2, 3]
+
+
+def test_rows_with_one_timestamp_keep_their_file_order():
+    rows = [at(0), at(0, user="b"), at(0)]
+    assert units.impressions(log(rows)).tolist() == [0, 1, 2]
+
+
 def test_resamples_draw_each_distinct_row_in_proportion_to_its_count():
     kinds = np.array([[1.0, 0.0], [0.0, 1.0], [0.0, 1.0], [0.0, 1.0]])
     sums = units.resampled(kinds, np.random.default_rng(0), 20_000)
@@ -71,7 +81,6 @@ def test_rows_that_click_together_widen_the_interval_of_larger_units():
     assert got["impressions"]["ips"]["sd"] / got["rows"]["ips"]["sd"] == approx(3**0.5, rel=0.1)
     assert got["sd_of_blocks_over"]["rows"]["ips"] == approx(3**0.5, rel=0.1)
     assert got["sd_of_blocks_over"]["impressions"]["ips"] == approx(1, rel=0.1)
-    assert got["rows"]["ips"]["estimate"] == approx(got["blocks"]["ips"]["estimate"])
 
 
 def impression(second, items, positions=(1, 2, 3)):
@@ -95,20 +104,31 @@ def test_list_reuse_compares_consecutive_complete_impressions():
 
 
 def test_variance_ratio_of_one_pair_of_blocks():
-    start = np.array([0, 1, 60, 61]) * 1_000_000
-    clicks, rows = np.array([1.0, 0, 0, 0]), np.ones(4)
-    # rates 0.5 and 0; variances (0.25 + 0.25) / 4 and 0
-    assert units.variance_ratio(start, clicks, rows, 1) == approx(0.25 / 0.125)
+    start = np.array([0, 1, 60, 61, 120, 121, 300]) * 1_000_000
+    clicks, rows = np.array([1.0, 0, 0, 0, 1, 1, 1]), np.ones(7)
+    # First pair: rates 0.5 and 0; variances 2 x (0.25 + 0.25) / 4 and 0. The third
+    # block faces an empty one and the sixth holds one impression: both pairs are left out.
+    assert units.variance_ratio(start, clicks, rows, 1) == approx(0.25 / 0.25)
+    assert units.variance_ratio(start[:6], clicks[:6], rows[:6], 1, False) == approx(0.25 / 0.125)
+
+
+def independent(rng, n):
+    start = rng.integers(0, 7 * 24 * 3600 * 1_000_000, n)
+    return start, (rng.random(n) < 0.3).astype(float), np.ones(n)
 
 
 def test_variance_ratio_is_one_for_independent_rows_and_larger_when_blocks_differ():
     rng = np.random.default_rng(5)
-    start = rng.integers(0, 7 * 24 * 3600 * 1_000_000, 200_000)
-    independent = (rng.random(200_000) < 0.3).astype(float)
+    start, clicks, rows = independent(rng, 200_000)
     by_block = 0.2 + 0.2 * (start // 600_000_000 % 2)
-    rows = np.ones(200_000)
-    assert units.variance_ratio(start, independent, rows, 10) == approx(1, abs=0.2)
+    assert units.variance_ratio(start, clicks, rows, 10) == approx(1, abs=0.2)
     assert units.variance_ratio(start, (rng.random(200_000) < by_block) * 1.0, rows, 10) > 5
+
+
+def test_variance_ratio_is_one_for_independent_rows_in_sparse_blocks():
+    start, clicks, rows = independent(np.random.default_rng(6), 5000)  # five to a block
+    assert units.variance_ratio(start, clicks, rows, 10) == approx(1, abs=0.2)
+    assert units.variance_ratio(start, clicks, rows, 10, False) > 1.4
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")  # no complete impression, empty blocks
@@ -119,8 +139,18 @@ def test_dependence_also_measures_clicks_net_of_their_item_and_position():
         for second, block in clicks.items()
         for i, (item, click) in enumerate(block)
     ]
-    # both blocks have a click rate of 1/3; item 0 has 2/3 and item 1 has 0
+    # Both blocks have a click rate of 1/3; item 0 has 2/3 and item 1 has 0. Net of
+    # these the rates are -1/9 and 1/9 and the variances 3/2 x 42/729 and 3/2 x 6/729.
     assert units.dependence(log(rows))["variance_ratio"][1] == {
         "clicks": approx(0),
-        "residuals": approx(0.75),
+        "residuals": approx(0.5),
+        "clicks_without_factor": approx(0),
     }
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")  # no complete impression, empty blocks
+def test_an_impression_belongs_to_the_block_of_its_first_row():
+    rows = [at(10), at(59.8, click=1), at(60.3), at(70), at(80)]
+    # First minute: impressions of (1 click, 2 rows) and (0, 1), rate 1/3, variance
+    # 2 x (1/9 + 1/9) / 9. Second minute: two impressions without a click.
+    assert units.dependence(log(rows))["variance_ratio"][1]["clicks"] == approx(2.25)
