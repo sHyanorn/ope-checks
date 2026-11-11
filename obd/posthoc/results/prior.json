@@ -1,0 +1,49 @@
+{
+ "post_hoc": true,
+ "code_commit": "b4fb7128d53dbde0069f4f2bc0644defd3ca35b4",
+ "numpy": "2.5.3",
+ "replicates": 10000,
+ "command": "python -m obd.posthoc.run prior",
+ "pairs": {
+  "all": 80,
+  "men": 34,
+  "women": 46
+ },
+ "distinct": {
+  "all": true,
+  "men": true,
+  "women": true
+ },
+ "shared": {
+  "all": {
+   "men": {
+    "pairs": 34,
+    "same_order": true
+   },
+   "women": {
+    "pairs": 0,
+    "same_order": true
+   }
+  },
+  "men": {
+   "all": {
+    "pairs": 34,
+    "same_order": true
+   },
+   "women": {
+    "pairs": 0,
+    "same_order": true
+   }
+  },
+  "women": {
+   "all": {
+    "pairs": 0,
+    "same_order": true
+   },
+   "men": {
+    "pairs": 0,
+    "same_order": true
+   }
+  }
+ }
+}
