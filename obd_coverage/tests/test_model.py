@@ -130,3 +130,68 @@ def test_drift_is_linear_between_the_midpoints_of_the_hours():
     by_hour = np.arange(1.0, model.HOURS + 1)
     t = np.array([0, 30, 60, 90, 10080]) * MINUTE_US
     assert model.drift(t, by_hour) == pytest.approx([1, 1, 1.5, 2, model.HOURS])
+
+
+def test_sizes_of_sessions_and_long_groups_can_be_set():
+    start = np.sort(np.random.default_rng(0).integers(0, 10080 * MINUTE_US, 200_000))
+    groups = model.groupings(start, 5, 60, np.random.default_rng(1), size=11, per_long=6)
+    assert np.bincount(groups.session).mean() == pytest.approx(11, rel=0.02)
+    assert np.bincount(groups.long).mean() == pytest.approx(6, rel=0.05)
+
+
+def test_sessions_within_kinds_hold_one_kind_and_keep_their_size_and_span():
+    rng = np.random.default_rng(0)
+    start = np.sort(rng.integers(0, 10080 * MINUTE_US, 200_000))
+    kind = rng.choice(3, 200_000, p=[0.7, 0.2999, 0.0001])
+    groups = model.groupings(start, 5, 60, np.random.default_rng(1), kind=kind)
+    kinds = np.zeros((groups.session.max() + 1, 3), bool)
+    kinds[groups.session, kind] = True
+    assert (kinds.sum(axis=1) == 1).all()
+    for k in range(2):  # as close to 5.5 as a whole number of labels allows
+        in_a_span = (kind == k).sum() * 5 / 10080
+        sizes = np.bincount(groups.session[kind == k])
+        expected = in_a_span / round(in_a_span / model.SESSION_SIZE)
+        assert sizes[sizes > 0].mean() == pytest.approx(expected, rel=0.02)
+        assert expected == pytest.approx(model.SESSION_SIZE, rel=0.1)
+    first, last = (np.full(groups.session.max() + 1, x) for x in (np.inf, -np.inf))
+    np.minimum.at(first, groups.session, start)
+    np.maximum.at(last, groups.session, start)
+    assert (last - first < 5 * MINUTE_US).all()
+    long_kinds = np.zeros((groups.long.max() + 1, 3), bool)
+    long_kinds[groups.long[groups.session], kind] = True
+    assert (long_kinds.sum(axis=1) == 1).all()
+
+
+def test_two_level_factors_keep_the_marginal_rate_and_the_pair_probabilities():
+    rng = np.random.default_rng(0)
+    n_impressions, e = 30_000, (2.5, 1.2, 0.4)
+    impression = np.repeat(np.arange(n_impressions), 3)
+    start = np.sort(rng.integers(0, 10080 * MINUTE_US, n_impressions))
+    groups = model.groupings(start, 5, 60, rng)
+    q = rng.uniform(0.02, 0.1, len(impression))
+    session, long = groups.session[impression], groups.long[groups.session][impression]
+    expected = np.array(pair_counts(q, impression, session, long)) - np.array(
+        [(q**2).sum() - q.sum()] * 3
+    )
+    expected = np.diff(expected, prepend=0) * (1 + np.array(e))
+    seen, total = np.zeros(3), 0
+    for _ in range(600):
+        rows = model.draw(rng, q, impression, groups, e, low=0.5)
+        clicks = np.zeros(len(q))
+        clicks[rows] = 1
+        seen += np.diff(pair_counts(clicks, impression, session, long), prepend=0)
+        total += clicks.sum()
+    assert total / 600 == pytest.approx(q.sum(), rel=0.01)
+    assert seen / 600 == pytest.approx(expected, rel=0.04)
+
+
+def test_a_two_level_factor_reaches_higher_than_an_on_off_factor():
+    e = (2.5, 1.2, 0.4)
+    assert model.largest_factor(e) == pytest.approx(3.5)
+    assert model.largest_factor(e, low=0.5) == pytest.approx(
+        1.8 * (1 + 2 * (2.2 / 1.4 - 1)) * (1 + 2 * (3.5 / 2.2 - 1))
+    )
+    with pytest.raises(ValueError, match="allow"):
+        model.draw(
+            np.random.default_rng(0), np.full(3, 0.2), np.zeros(3, int), None, (3, 0, 0), 0.5
+        )

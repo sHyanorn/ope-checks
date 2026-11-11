@@ -104,8 +104,35 @@ def scenario_parts(logs, calibration, scenario, campaign):
     )
 
 
-def calibrate(logs, clicks, target, campaign):
-    """The parameters of Section 5 for one campaign, and the coverage they predict."""
+def predicted(parts):
+    """By quantity: the true variance, the variance each unit expects, the coverage that gives."""
+    out = {}
+    for quantity in QUANTITIES:
+        true = moments.true_variance(parts[quantity])
+        expected = {unit: moments.bootstrap_variance(parts[quantity], unit) for unit in UNITS}
+        out[quantity] = {
+            "true_variance": true,
+            "bootstrap_variance": {str(unit): v for unit, v in expected.items()},
+            "coverage": {str(unit): moments.coverage(v / true) for unit, v in expected.items()},
+        }
+    return out
+
+
+def calibrate(
+    logs,
+    clicks,
+    target,
+    campaign,
+    size=model.SESSION_SIZE,
+    per_long=model.SESSIONS_PER_LONG_GROUP,
+    scenarios=SCENARIOS,
+):
+    """The parameters of Section 5 for one campaign, and the coverage they predict.
+
+    `size` and `per_long` are the impressions of a session and the sessions of a
+    long group; the registration fixes them. The true values and the predictions
+    are those of the registered `scenarios` and take the registered sizes.
+    """
     rate = model.cell_rates(logs, clicks, int(max(log.cell.max() for log in logs)) + 1)
     by_hour = model.fitted_drift(logs, clicks, rate)
     q = [rate[log.cell] for log in logs]
@@ -134,7 +161,9 @@ def calibrate(logs, clicks, target, campaign):
     for i, (log, name) in enumerate(zip(logs, LOGS, strict=True)):
         ratios, tried = target["variance_ratio"][name], {}
         for minutes in model.SPANS:
-            session = model.groupings(log.start, minutes, None, grouping_rng(campaign, i)).session
+            session = model.groupings(
+                log.start, minutes, None, grouping_rng(campaign, i), size
+            ).session
             at_ten = moments.variance_ratio_moments(log, q[i], session, e_i, 10)
             e_s = clipped(
                 f"e_S of the {name} log at {minutes} minutes",
@@ -153,7 +182,12 @@ def calibrate(logs, clicks, target, campaign):
     for span in LONG.values():
         groups = [
             model.groupings(
-                log.start, out["session"][name]["minutes"], span, grouping_rng(campaign, i)
+                log.start,
+                out["session"][name]["minutes"],
+                span,
+                grouping_rng(campaign, i),
+                size,
+                per_long,
             )
             for i, (log, name) in enumerate(zip(logs, LOGS, strict=True))
         ]
@@ -171,17 +205,9 @@ def calibrate(logs, clicks, target, campaign):
     if not (1 + e_i) * rate.max() <= 1:
         raise SystemExit(f"{campaign}: (1 + e_I) max q = {(1 + e_i) * rate.max():.3f} exceeds 1")
     out["truth"], out["predicted"] = {}, {}
-    for scenario in SCENARIOS:
+    for scenario in scenarios:
         parts, out["truth"][scenario] = scenario_parts(logs, out, scenario, campaign)
-        out["predicted"][scenario] = {}
-        for quantity in QUANTITIES:
-            true = moments.true_variance(parts[quantity])
-            expected = {unit: moments.bootstrap_variance(parts[quantity], unit) for unit in UNITS}
-            out["predicted"][scenario][quantity] = {
-                "true_variance": true,
-                "bootstrap_variance": {str(unit): v for unit, v in expected.items()},
-                "coverage": {str(unit): moments.coverage(v / true) for unit, v in expected.items()},
-            }
+        out["predicted"][scenario] = predicted(parts)
     return out
 
 
@@ -231,9 +257,8 @@ def simulate(logs, calibration, campaign, scenario, path, n_data_sets):
             print(f"{campaign} {scenario}: {s + 1} data sets", flush=True)
 
 
-def summarise(state, calibration, scenario, target):
-    """Section 8 for one scenario and campaign."""
-    truth, predicted = calibration["truth"][scenario], calibration["predicted"][scenario]
+def cells(state, truth, expected):
+    """Every cell of one scenario and campaign: Section 8 of the registration."""
     out = {"data_sets": int(state["done"]), "cells": {}}
     for j, quantity in enumerate(QUANTITIES):
         out["cells"][quantity] = {}
@@ -245,11 +270,17 @@ def summarise(state, calibration, scenario, target):
                 state["sd"][:, u, j],
                 truth[quantity],
             )
-            cell["predicted_coverage"] = predicted[quantity]["coverage"][str(unit)]
+            cell["predicted_coverage"] = expected[quantity]["coverage"][str(unit)]
             out["cells"][quantity][str(unit)] = cell
+    return out
+
+
+def widths(state, target):
+    """Standard deviations of the replicates of the IPS ratio under one unit over those
+    under another, over the data sets, beside the published ratios."""
     sd = state["sd"][:, :, 0]
     ten, by_rows = sd[:, UNITS.index(10)], sd[:, UNITS.index("rows")]
-    out["sd_of_ips_ratio"] = {
+    return {
         "over_ten_minutes": {
             str(m): reading.spread(sd[:, UNITS.index(m)] / ten) | {"published": published_m}
             for m, published_m in target["sd_over_ten_minutes"].items()
@@ -259,6 +290,12 @@ def summarise(state, calibration, scenario, target):
         "blocks_over_rows": reading.spread(ten / by_rows)
         | {"published": target["blocks_over_rows"]},
     }
+
+
+def summarise(state, calibration, scenario, target):
+    """Section 8 for one scenario and campaign."""
+    out = cells(state, calibration["truth"][scenario], calibration["predicted"][scenario])
+    out["sd_of_ips_ratio"] = widths(state, target)
     out["variance_ratio"] = {
         log: {
             str(m): {

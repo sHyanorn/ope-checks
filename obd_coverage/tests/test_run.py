@@ -3,17 +3,11 @@ import json
 import numpy as np
 import pytest
 
-from obd.posthoc import blocks
 from obd_coverage import run
 from obd_coverage.intervals import QUANTITIES, UNITS
 from obd_coverage.tests import small
 
-TARGET = {
-    "impressions_over_rows": 1.05,
-    "blocks_over_rows": 1.2,
-    "variance_ratio": {log: {1: 1.02, 10: 1.1, 60: 1.1} for log in run.LOGS},
-    "sd_over_ten_minutes": dict.fromkeys(blocks.MINUTES, 1.0) | {180: 1.04},
-}
+TARGET = small.TARGET
 
 
 @pytest.fixture(scope="module")

@@ -2,8 +2,17 @@
 
 import numpy as np
 
+from obd.posthoc import blocks
 from obd.tests import synthetic
 from obd_coverage import model
+
+# Published numbers of the kind the calibration is solved from.
+TARGET = {
+    "impressions_over_rows": 1.05,
+    "blocks_over_rows": 1.2,
+    "variance_ratio": {log: {1: 1.02, 10: 1.1, 60: 1.1} for log in ("random", "bts")},
+    "sd_over_ten_minutes": dict.fromkeys(blocks.MINUTES, 1.0) | {180: 1.04},
+}
 
 
 def frames(seed, n_random=6000, n_bts=30000, n_items=6):
