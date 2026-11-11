@@ -137,3 +137,7 @@ python -m obd.figures.make
 ```
 
 `python -m obd.figures.make --pdf --out DIR` writes each figure once, as a vector PDF on a white page. The test is skipped where matplotlib is not installed.
+
+## obd_coverage: do the bootstrap intervals cover?
+
+A semi-synthetic study of the intervals used above: the logs keep their rows and get clicks from a known process, and the coverage of nominal 95% intervals is counted by resampling unit and by the kind of dependence among clicks. Registration, calibration, results and reading are in [`obd_coverage/`](obd_coverage/README.md). It changes no registered file, result or label of `obd`.
