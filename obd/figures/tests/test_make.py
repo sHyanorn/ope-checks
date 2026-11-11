@@ -25,7 +25,8 @@ def size(path):
         return struct.unpack(">8x4x4sII", file.read(24))[1:]
 
 
-def test_every_figure_is_written_in_both_modes_at_the_same_size(tmp_path):
+def results(tmp_path):
+    """Result files with the keys the figures read; the arguments that point `make` at them."""
     pooled = {
         "replicates": 100,
         "weights": {"all": 0.54, "women": 0.46},
@@ -38,12 +39,26 @@ def test_every_figure_is_written_in_both_modes_at_the_same_size(tmp_path):
     h3 = {"h3": {"rows": unit, "impressions": unit, "blocks": unit}}
     units = {"replicates": 100, "all": h3, "women": h3, "men": h3}
     (tmp_path / "units.json").write_text(json.dumps(units))
+    return ["--registered", str(tmp_path), "--posthoc", str(tmp_path), "--out", str(tmp_path)]
 
-    make.main(["--registered", str(tmp_path), "--posthoc", str(tmp_path), "--out", str(tmp_path)])
+
+NAMES = ["confirmatory-estimates", "prior-distance", "resampling-units"]
+
+
+def test_every_figure_is_written_in_both_modes_at_the_same_size(tmp_path):
+    make.main(results(tmp_path))
 
     written = sorted(path.name for path in tmp_path.glob("*.png"))
-    names = ["confirmatory-estimates", "prior-distance", "resampling-units"]
-    assert written == [f"{name}-{mode}.png" for name in names for mode in ("dark", "light")]
-    for name in names:
+    assert written == [f"{name}-{mode}.png" for name in NAMES for mode in ("dark", "light")]
+    for name in NAMES:
         light, dark = (size(tmp_path / f"{name}-{mode}.png") for mode in ("light", "dark"))
         assert light == dark and light[0] >= 1600
+
+
+def test_pdf_writes_each_figure_once_and_no_png(tmp_path):
+    make.main([*results(tmp_path), "--pdf"])
+
+    assert sorted(path.name for path in tmp_path.glob("*.pdf")) == [f"{name}.pdf" for name in NAMES]
+    assert not list(tmp_path.glob("*.png"))
+    for name in NAMES:
+        assert (tmp_path / f"{name}.pdf").read_bytes().startswith(b"%PDF")

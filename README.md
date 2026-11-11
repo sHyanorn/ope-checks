@@ -127,4 +127,4 @@ pip install -e ".[figures]"
 python -m obd.figures.make
 ```
 
-Their test is skipped where matplotlib is not installed.
+`python -m obd.figures.make --pdf --out DIR` writes each figure once, as a vector PDF on a white page. The test is skipped where matplotlib is not installed.

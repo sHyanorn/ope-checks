@@ -3,7 +3,8 @@
     python -m obd.figures.make
 
 Reads obd/results and obd/posthoc/results and writes three figures to obd/figures, each as
-<name>-light.png and <name>-dark.png. Needs matplotlib: pip install -e ".[figures]".
+<name>-light.png and <name>-dark.png. With --pdf it writes each figure once, as a vector
+<name>.pdf on a white page. Needs matplotlib: pip install -e ".[figures]".
 """
 
 import argparse
@@ -40,6 +41,7 @@ THEMES = {
         "aqua": "#199e70",
     },
 }
+PRINT = THEMES["light"] | {"surface": "#ffffff"}
 CAMPAIGNS = {"all": "All", "women": "Women's", "men": "Men's"}
 UNITS = {
     "rows": ("rows", "orange"),
@@ -203,6 +205,7 @@ def main(argv=None):
     parser.add_argument("--registered", type=Path, default=REGISTERED)
     parser.add_argument("--posthoc", type=Path, default=POSTHOC)
     parser.add_argument("--out", type=Path, default=HERE)
+    parser.add_argument("--pdf", action="store_true", help="vector PDF files on a white page")
     args = parser.parse_args(argv)
     registered = {
         name: json.loads((args.registered / f"{name}.json").read_text())
@@ -214,12 +217,15 @@ def main(argv=None):
         "confirmatory-estimates": lambda theme: confirmatory_estimates(registered, theme),
         "prior-distance": lambda theme: prior_distance(registered, theme),
     }
-    # Default settings, whatever matplotlibrc the machine has
-    with matplotlib.style.context("default"):
+    files = (
+        {".pdf": PRINT} if args.pdf else {f"-{mode}.png": theme for mode, theme in THEMES.items()}
+    )
+    # Default settings, whatever matplotlibrc the machine has; text in a PDF stays text
+    with matplotlib.style.context("default"), matplotlib.rc_context({"pdf.fonttype": 42}):
         for name, figure in figures.items():
-            for mode, theme in THEMES.items():
-                figure(theme).savefig(args.out / f"{name}-{mode}.png")
-                print(f"wrote {args.out / f'{name}-{mode}.png'}")
+            for ending, theme in files.items():
+                figure(theme).savefig(args.out / f"{name}{ending}")
+                print(f"wrote {args.out / f'{name}{ending}'}")
 
 
 if __name__ == "__main__":
