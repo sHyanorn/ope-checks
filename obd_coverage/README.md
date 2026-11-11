@@ -5,6 +5,7 @@ A semi-synthetic study of the intervals used in [`obd`](../README.md). The logs 
 - [`PREREGISTRATION.md`](PREREGISTRATION.md): the click model, the scenarios, the calibration rule, the number of data sets and the reading, committed before any code (`f507c89`).
 - `results/calibration.json`: the parameters, the true values and the predicted coverage of every cell, committed before any click was generated (`90f9a44`, from code `f4cddc3`).
 - `results/coverage.json`: every cell and the reading; `results/cells.md`: one line per cell.
+- [`EXTENSION.md`](EXTENSION.md): an extension registered afterwards (`af7e615`); its results are in [`results/extension/`](results/extension/README.md) and summarised below.
 
 The registration was written with the results of `obd` known. Its calibration uses numbers published in `obd/posthoc/results/`, and the click rates by item and position and the drift of scenario D are fitted to the real clicks.
 
@@ -170,6 +171,14 @@ The prediction lies outside the Wilson interval of the simulated coverage in 147
 
 Section 10 of the registration. In short: it does not show that the real dependence has any of these structures, nor which of them is behind the widening on Women's; a drift that the two logs do not share was not simulated; the true values are conditional on the kept rows; the strengths rest on published point values without intervals, on a session size taken from one log, and on long groups of three sessions chosen without a measurement.
 
+## Extension
+
+The extension measures the dependence of the real clicks directly, fits a scenario F to those measurements, sets dependence beyond ten minutes against a drift that the two logs do not share, and varies the session size, the size of the long groups and the shape of the group factor. It changes no file, result or label above. On the IPS ratio on All and Women's ([`results/extension/README.md`](results/extension/README.md)):
+
+- Three results above keep their labels in every variant: in M rows and impressions under-cover; in M every block length is adequate; in H ten-minute blocks under-cover.
+- In F every block length is adequate. Rows and impressions under-cover on All (0.905 and 0.910) and are unresolved on Women's (0.922 and 0.928), where M gave 0.846 and 0.860. F reproduces 16 of 25 statistics of the logs on All and 11 on Women's, and on no campaign the published ratio of ten-minute blocks to rows.
+- The widening on Women's is not attributed. The registered observable does not separate dependence beyond ten minutes, under which ten-minute blocks cover 0.830, from a drift in one log, under which they cover 0.960. The statement above that the ten-minute intervals on Women's are not shown to cover stands.
+
 ## Earlier work
 
 A search found no study that counts the coverage of intervals for off-policy estimates on this dataset, compares resampling units on it against a known value, or generates clicks on its kept lists. It covered arXiv, the papers that Semantic Scholar lists as citing the dataset paper, OpenAlex and Crossref, and the issue list of the pipeline's repository, with the name of the dataset combined with coverage, bootstrap, resampling unit, block or cluster bootstrap, A/A test, semi-synthetic and i.i.d., and off-policy evaluation combined with clustered, dependent or non-stationary data. The intervals of the Open Bandit Pipeline resample rows (`obp/utils.py`, tag 0.5.5), and the dataset paper (arXiv 2008.07146v5) reports no coverage. The simulations of interval coverage for off-policy estimates that were read draw independent rounds. A search that finds nothing does not show that nothing exists. Korovaitceva et al. (Web Conference 2026), read in full after the study was run, examine this dataset on the All campaign: a recorded propensity of the BTS log that changes during the week, chi-square tests of the random log against uniformity, and the absence of a user identifier. They report no interval for an estimate on the dataset, no coverage and no comparison of resampling units. Not obtained in full, and so not used: Lahiri (1999), Politis and Romano (1994), Hall, Horowitz and Jing (1995), Burton et al. (2006), Bradley (1978). The sources the design borrows from are in Section 13 of the registration.
@@ -183,9 +192,15 @@ python -m obd_coverage.run calibrate   # results/calibration.json
 python -m obd_coverage.run simulate    # about 4 CPU hours; --scenarios and a campaign name run a part
 python -m obd_coverage.run read        # results/coverage.json
 python -m obd_coverage.tables          # the tables above and results/cells.md
+
+python -m obd_coverage.extension check       # the registered parameters, with the extended code
+python -m obd_coverage.extension calibrate   # results/extension/calibration.json; reads the clicks
+python -m obd_coverage.extension simulate    # about 8 CPU hours; --scenarios and a campaign name run a part
+python -m obd_coverage.extension read        # results/extension/coverage.json
+python -m obd_coverage.extension_tables      # the tables of results/extension/
 ```
 
-The simulation keeps its progress in `~/.cache/ope-checks/coverage` (`--work-dir`) and continues from there. The results come from one run of commit `df8019a` (numpy 2.5.3).
+The simulation keeps its progress in `~/.cache/ope-checks/coverage` (`--work-dir`) and continues from there. The results come from one run of commit `df8019a` (numpy 2.5.3). The extension keeps its progress in `~/.cache/ope-checks/coverage/extension`; its data sets come from one run of commits `2e4eee4` to `af23a3c`, which do not differ in the code that generates or resamples clicks (numpy 2.5.3, four processes with one thread each).
 
 | File | Content |
 |---|---|
@@ -195,3 +210,6 @@ The simulation keeps its progress in `~/.cache/ope-checks/coverage` (`--work-dir
 | `reading.py` | coverage, Wilson interval, labels |
 | `run.py` | calibration, simulation, the registered reading |
 | `tables.py` | tables from the result files |
+| `direct.py` | the extension: double clicks, variance ratios with intervals, block residuals by log and user type |
+| `extension.py` | the extension: calibration, simulation, the registered reading |
+| `extension_tables.py` | the extension: tables from its result files |
