@@ -1,0 +1,1086 @@
+{
+ "code_commit": "fb90b37efb9407dadf5f93e56938449c61565bb9",
+ "numpy": "2.5.3",
+ "command": "python -m obd_coverage.extension posthoc",
+ "calibration_commit": "c7609da28d3b746a99eed70550a878916bff802e",
+ "all": {
+  "sessions": {
+   "random": {
+    "5.5": {
+     "1": {
+      "e": 13.42281240132402,
+      "solved": 46.380879421660694,
+      "variance_ratio_at_1": 1.1454084523658483,
+      "sessions": 218776,
+      "impressions_per_session": 1.9375799904925586,
+      "seen_from_an_impression": 4.105110687527129
+     },
+     "2": {
+      "e": 13.42281240132402,
+      "solved": 47.97153588729417,
+      "variance_ratio_at_1": 1.0472831012993318,
+      "sessions": 183448,
+      "impressions_per_session": 2.3107147529545156,
+      "seen_from_an_impression": 4.417432577802102
+     },
+     "3": {
+      "e": 13.42281240132402,
+      "solved": 42.11367087162162,
+      "variance_ratio_at_1": 1.024880556068604,
+      "sessions": 159156,
+      "impressions_per_session": 2.6633994320038203,
+      "seen_from_an_impression": 5.308184082888256
+     },
+     "5": {
+      "e": 13.42281240132402,
+      "solved": 44.54079387933549,
+      "variance_ratio_at_1": 1.0108962770692695,
+      "sessions": 139811,
+      "impressions_per_session": 3.0319216656772356,
+      "seen_from_an_impression": 5.695689508747429
+     },
+     "10": {
+      "e": 13.42281240132402,
+      "solved": 59.68164983010951,
+      "variance_ratio_at_1": 1.0055184298503597,
+      "sessions": 113896,
+      "impressions_per_session": 3.721781274144834,
+      "seen_from_an_impression": 6.553961349010135
+     }
+    },
+    "11": {
+     "1": {
+      "e": 13.42281240132402,
+      "solved": 24.837813427203212,
+      "variance_ratio_at_1": 1.381472350344559,
+      "sessions": 209306,
+      "impressions_per_session": 2.025245334581904,
+      "seen_from_an_impression": 6.433167569403816
+     },
+     "2": {
+      "e": 13.42281240132402,
+      "solved": 24.17497360496031,
+      "variance_ratio_at_1": 1.0620979361858036,
+      "sessions": 169659,
+      "impressions_per_session": 2.4985176147448707,
+      "seen_from_an_impression": 7.239186026761281
+     },
+     "3": {
+      "e": 13.42281240132402,
+      "solved": 23.78722956261391,
+      "variance_ratio_at_1": 1.0464751288322476,
+      "sessions": 146725,
+      "impressions_per_session": 2.889050945646618,
+      "seen_from_an_impression": 8.002901655122955
+     },
+     "5": {
+      "e": 13.42281240132402,
+      "solved": 25.4277890982974,
+      "variance_ratio_at_1": 1.0155937962404087,
+      "sessions": 121659,
+      "impressions_per_session": 3.4842962707239087,
+      "seen_from_an_impression": 8.697416347405968
+     },
+     "10": {
+      "e": 13.42281240132402,
+      "solved": 33.411750895374745,
+      "variance_ratio_at_1": 1.008258322775207,
+      "sessions": 93905,
+      "impressions_per_session": 4.514094031201746,
+      "seen_from_an_impression": 10.283649763149452
+     }
+    },
+    "22": {
+     "1": {
+      "e": 13.42281240132402,
+      "solved": 24.837813427203212,
+      "variance_ratio_at_1": 1.381472350344559,
+      "sessions": 209306,
+      "impressions_per_session": 2.025245334581904,
+      "seen_from_an_impression": 6.433167569403816
+     },
+     "2": {
+      "e": 12.536026361940635,
+      "solved": 12.536026361940635,
+      "variance_ratio_at_1": 1.0101884622078343,
+      "sessions": 164501,
+      "impressions_per_session": 2.57685971513851,
+      "seen_from_an_impression": 11.94699171494895
+     },
+     "3": {
+      "e": 13.42281240132402,
+      "solved": 17.154594725339877,
+      "variance_ratio_at_1": 1.069738627093679,
+      "sessions": 143363,
+      "impressions_per_session": 2.95680196424461,
+      "seen_from_an_impression": 10.363466510653556
+     },
+     "5": {
+      "e": 13.42281240132402,
+      "solved": 15.18127810896167,
+      "variance_ratio_at_1": 1.0229372339656428,
+      "sessions": 115770,
+      "impressions_per_session": 3.661535803748812,
+      "seen_from_an_impression": 12.628696661445261
+     },
+     "10": {
+      "e": 13.42281240132402,
+      "solved": 18.022593699733008,
+      "variance_ratio_at_1": 1.012905200997685,
+      "sessions": 84111,
+      "impressions_per_session": 5.0397213206358265,
+      "seen_from_an_impression": 16.268150678468302
+     }
+    },
+    "44": {
+     "1": {
+      "e": 13.42281240132402,
+      "solved": 24.837813427203212,
+      "variance_ratio_at_1": 1.381472350344559,
+      "sessions": 209306,
+      "impressions_per_session": 2.025245334581904,
+      "seen_from_an_impression": 6.433167569403816
+     },
+     "2": {
+      "e": 12.536026361940635,
+      "solved": 12.536026361940635,
+      "variance_ratio_at_1": 1.0101884622078343,
+      "sessions": 164501,
+      "impressions_per_session": 2.57685971513851,
+      "seen_from_an_impression": 11.94699171494895
+     },
+     "3": {
+      "e": 9.482686344524184,
+      "solved": 9.482686344524184,
+      "variance_ratio_at_1": 1.0778403042883573,
+      "sessions": 140111,
+      "impressions_per_session": 3.025429837771481,
+      "seen_from_an_impression": 17.440315549096947
+     },
+     "5": {
+      "e": 5.310480600948788,
+      "solved": 5.310480600948788,
+      "variance_ratio_at_1": 1.0217327819289812,
+      "sessions": 111809,
+      "impressions_per_session": 3.7912511515173195,
+      "seen_from_an_impression": 28.39614905542869
+     },
+     "10": {
+      "e": 9.965975822546403,
+      "solved": 9.965975822546403,
+      "variance_ratio_at_1": 1.0102056502782988,
+      "sessions": 81160,
+      "impressions_per_session": 5.222966978807294,
+      "seen_from_an_impression": 24.139925830864176
+     }
+    }
+   },
+   "bts": {
+    "5.5": {
+     "1": {
+      "e": 10.50995580861386,
+      "solved": 19.95796535321974,
+      "variance_ratio_at_1": 1.2204898721686008,
+      "sessions": 1027328,
+      "impressions_per_session": 3.6318975049838027,
+      "seen_from_an_impression": 6.634612384921539
+     },
+     "2": {
+      "e": 10.50995580861386,
+      "solved": 18.781495765149504,
+      "variance_ratio_at_1": 1.0806733145117375,
+      "sessions": 845156,
+      "impressions_per_session": 4.414747099943679,
+      "seen_from_an_impression": 7.5185168111708185
+     },
+     "3": {
+      "e": 10.50995580861386,
+      "solved": 19.125574215973952,
+      "variance_ratio_at_1": 1.0441820921738507,
+      "sessions": 778833,
+      "impressions_per_session": 4.7906932551651,
+      "seen_from_an_impression": 7.8810672312825805
+     },
+     "5": {
+      "e": 10.50995580861386,
+      "solved": 20.823675347872243,
+      "variance_ratio_at_1": 1.0186399690611472,
+      "sessions": 719304,
+      "impressions_per_session": 5.187167039249052,
+      "seen_from_an_impression": 8.165121745306406
+     },
+     "10": {
+      "e": 10.50995580861386,
+      "solved": 29.60522313254182,
+      "variance_ratio_at_1": 1.0074836684891137,
+      "sessions": 680071,
+      "impressions_per_session": 5.486412448112035,
+      "seen_from_an_impression": 8.288519089288824
+     }
+    },
+    "11": {
+     "1": {
+      "e": 10.50995580861386,
+      "solved": 10.78897594191468,
+      "variance_ratio_at_1": 1.4527306626554382,
+      "sessions": 846089,
+      "impressions_per_session": 4.409878866171289,
+      "seen_from_an_impression": 10.995438939737078
+     },
+     "2": {
+      "e": 10.50995580861386,
+      "solved": 10.589977307257092,
+      "variance_ratio_at_1": 1.1713456224843748,
+      "sessions": 645654,
+      "impressions_per_session": 5.77886917760906,
+      "seen_from_an_impression": 12.160498505822602
+     },
+     "3": {
+      "e": 10.385519224725037,
+      "solved": 10.385519224725037,
+      "variance_ratio_at_1": 1.0790861150578686,
+      "sessions": 549288,
+      "impressions_per_session": 6.792702553123316,
+      "seen_from_an_impression": 13.309035552041596
+     },
+     "5": {
+      "e": 10.50995580861386,
+      "solved": 11.058282834265073,
+      "variance_ratio_at_1": 1.0326178136532065,
+      "sessions": 468458,
+      "impressions_per_session": 7.96474817379573,
+      "seen_from_an_impression": 14.311376385296759
+     },
+     "10": {
+      "e": 10.50995580861386,
+      "solved": 15.629192034398638,
+      "variance_ratio_at_1": 1.0117853490221758,
+      "sessions": 400577,
+      "impressions_per_session": 9.314438921855224,
+      "seen_from_an_impression": 15.098579794433352
+     }
+    },
+    "22": {
+     "1": {
+      "e": 6.0823480676732,
+      "solved": 6.0823480676732,
+      "variance_ratio_at_1": 1.387735111212023,
+      "sessions": 777915,
+      "impressions_per_session": 4.796346644556282,
+      "seen_from_an_impression": 16.749805287913915
+     },
+     "2": {
+      "e": 5.697862507490372,
+      "solved": 5.697862507490372,
+      "variance_ratio_at_1": 1.1313547558124506,
+      "sessions": 547878,
+      "impressions_per_session": 6.810184019069939,
+      "seen_from_an_impression": 20.860989239242592
+     },
+     "3": {
+      "e": 5.398463611908806,
+      "solved": 5.398463611908806,
+      "variance_ratio_at_1": 1.0745299720506196,
+      "sessions": 441458,
+      "impressions_per_session": 8.451879907035323,
+      "seen_from_an_impression": 23.946921994559318
+     },
+     "5": {
+      "e": 5.999004179539738,
+      "solved": 5.999004179539738,
+      "variance_ratio_at_1": 1.0325278148093116,
+      "sessions": 351157,
+      "impressions_per_session": 10.625304351045258,
+      "seen_from_an_impression": 24.611199228120018
+     },
+     "10": {
+      "e": 8.14116289180285,
+      "solved": 8.14116289180285,
+      "variance_ratio_at_1": 1.0165330936114139,
+      "sessions": 265575,
+      "impressions_per_session": 14.0493269321284,
+      "seen_from_an_impression": 27.23283652493199
+     }
+    },
+    "44": {
+     "1": {
+      "e": 3.504143046628353,
+      "solved": 3.504143046628353,
+      "variance_ratio_at_1": 1.4934502738791386,
+      "sessions": 757632,
+      "impressions_per_session": 4.924752386382835,
+      "seen_from_an_impression": 25.072696621685004
+     },
+     "2": {
+      "e": 3.2303096956920503,
+      "solved": 3.2303096956920503,
+      "variance_ratio_at_1": 1.1709130784382233,
+      "sessions": 512833,
+      "impressions_per_session": 7.275565339983971,
+      "seen_from_an_impression": 32.37213352451657
+     },
+     "3": {
+      "e": 3.256023940410355,
+      "solved": 3.256023940410355,
+      "variance_ratio_at_1": 1.07314889482971,
+      "sessions": 404776,
+      "impressions_per_session": 9.217814297290353,
+      "seen_from_an_impression": 37.22852150141377
+     },
+     "5": {
+      "e": 3.256439546381045,
+      "solved": 3.256439546381045,
+      "variance_ratio_at_1": 1.031675369159045,
+      "sessions": 301162,
+      "impressions_per_session": 12.389179245721571,
+      "seen_from_an_impression": 42.43481553944494
+     },
+     "10": {
+      "e": 4.436609203652848,
+      "solved": 4.436609203652848,
+      "variance_ratio_at_1": 1.0166609939060793,
+      "sessions": 205213,
+      "impressions_per_session": 18.181840331752863,
+      "seen_from_an_impression": 47.66950243222599
+     }
+    }
+   }
+  },
+  "largest_impression": {
+   "random": {
+    "rows": 10,
+    "clicks": 4,
+    "pairs": 6.0,
+    "share_of_pairs": 0.0196078431372549,
+    "excess_without": 13.140266858371394
+   },
+   "bts": {
+    "rows": 12,
+    "clicks": 11,
+    "pairs": 55.0,
+    "share_of_pairs": 0.009945750452079566,
+    "excess_without": 10.39552912305871
+   }
+  }
+ },
+ "men": {
+  "sessions": {
+   "random": {
+    "5.5": {
+     "1": {
+      "e": 19.06707747893844,
+      "solved": 119.67755306015472,
+      "variance_ratio_at_1": 1.153870573451695,
+      "sessions": 98648,
+      "impressions_per_session": 1.4950835293163571,
+      "seen_from_an_impression": 2.7328171296453245
+     },
+     "2": {
+      "e": 19.06707747893844,
+      "solved": 62.92241700572494,
+      "variance_ratio_at_1": 1.03492202312885,
+      "sessions": 83331,
+      "impressions_per_session": 1.7698935570195966,
+      "seen_from_an_impression": 4.487073436980887
+     },
+     "3": {
+      "e": 19.06707747893844,
+      "solved": 77.00683101209623,
+      "variance_ratio_at_1": 1.0307254123082057,
+      "sessions": 77314,
+      "impressions_per_session": 1.9076363918565848,
+      "seen_from_an_impression": 4.029677191888099
+     },
+     "5": {
+      "e": 19.06707747893844,
+      "solved": 91.69913048872104,
+      "variance_ratio_at_1": 1.014827689154474,
+      "sessions": 68047,
+      "impressions_per_session": 2.167428395079871,
+      "seen_from_an_impression": 4.194586641534508
+     },
+     "10": {
+      "e": 19.06707747893844,
+      "solved": 86.48986796906237,
+      "variance_ratio_at_1": 1.0098670917903179,
+      "sessions": 53203,
+      "impressions_per_session": 2.7721557055053285,
+      "seen_from_an_impression": 5.692820384169452
+     }
+    },
+    "11": {
+     "1": {
+      "e": 19.06707747893844,
+      "solved": 119.67755306015472,
+      "variance_ratio_at_1": 1.153870573451695,
+      "sessions": 98648,
+      "impressions_per_session": 1.4950835293163571,
+      "seen_from_an_impression": 2.7328171296453245
+     },
+     "2": {
+      "e": 19.06707747893844,
+      "solved": 62.92241700572494,
+      "variance_ratio_at_1": 1.03492202312885,
+      "sessions": 83331,
+      "impressions_per_session": 1.7698935570195966,
+      "seen_from_an_impression": 4.487073436980887
+     },
+     "3": {
+      "e": 19.06707747893844,
+      "solved": 45.47227661607369,
+      "variance_ratio_at_1": 1.0444948231913824,
+      "sessions": 74210,
+      "impressions_per_session": 1.9874275704083009,
+      "seen_from_an_impression": 6.216663163533057
+     },
+     "5": {
+      "e": 19.06707747893844,
+      "solved": 60.763698134531474,
+      "variance_ratio_at_1": 1.0212303561644243,
+      "sessions": 64473,
+      "impressions_per_session": 2.287577745723016,
+      "seen_from_an_impression": 6.012970634700007
+     },
+     "10": {
+      "e": 19.06707747893844,
+      "solved": 73.19716737541403,
+      "variance_ratio_at_1": 1.0117009418791407,
+      "sessions": 50487,
+      "impressions_per_session": 2.9212866678550915,
+      "seen_from_an_impression": 7.251113657474896
+     }
+    },
+    "22": {
+     "1": {
+      "e": 19.06707747893844,
+      "solved": 119.67755306015472,
+      "variance_ratio_at_1": 1.153870573451695,
+      "sessions": 98648,
+      "impressions_per_session": 1.4950835293163571,
+      "seen_from_an_impression": 2.7328171296453245
+     },
+     "2": {
+      "e": 19.06707747893844,
+      "solved": 62.92241700572494,
+      "variance_ratio_at_1": 1.03492202312885,
+      "sessions": 83331,
+      "impressions_per_session": 1.7698935570195966,
+      "seen_from_an_impression": 4.487073436980887
+     },
+     "3": {
+      "e": 19.06707747893844,
+      "solved": 45.47227661607369,
+      "variance_ratio_at_1": 1.0444948231913824,
+      "sessions": 74210,
+      "impressions_per_session": 1.9874275704083009,
+      "seen_from_an_impression": 6.216663163533057
+     },
+     "5": {
+      "e": 19.06707747893844,
+      "solved": 35.2269510482325,
+      "variance_ratio_at_1": 1.041025036888347,
+      "sessions": 62492,
+      "impressions_per_session": 2.3600940920437816,
+      "seen_from_an_impression": 9.65513570687586
+     },
+     "10": {
+      "e": 19.06707747893844,
+      "solved": 61.481046265694026,
+      "variance_ratio_at_1": 1.0206781261587736,
+      "sessions": 48494,
+      "impressions_per_session": 3.041345321070648,
+      "seen_from_an_impression": 10.889915721385613
+     }
+    },
+    "44": {
+     "1": {
+      "e": 19.06707747893844,
+      "solved": 119.67755306015472,
+      "variance_ratio_at_1": 1.153870573451695,
+      "sessions": 98648,
+      "impressions_per_session": 1.4950835293163571,
+      "seen_from_an_impression": 2.7328171296453245
+     },
+     "2": {
+      "e": 19.06707747893844,
+      "solved": 62.92241700572494,
+      "variance_ratio_at_1": 1.03492202312885,
+      "sessions": 83331,
+      "impressions_per_session": 1.7698935570195966,
+      "seen_from_an_impression": 4.487073436980887
+     },
+     "3": {
+      "e": 19.06707747893844,
+      "solved": 45.47227661607369,
+      "variance_ratio_at_1": 1.0444948231913824,
+      "sessions": 74210,
+      "impressions_per_session": 1.9874275704083009,
+      "seen_from_an_impression": 6.216663163533057
+     },
+     "5": {
+      "e": 19.06707747893844,
+      "solved": 35.2269510482325,
+      "variance_ratio_at_1": 1.041025036888347,
+      "sessions": 62492,
+      "impressions_per_session": 2.3600940920437816,
+      "seen_from_an_impression": 9.65513570687586
+     },
+     "10": {
+      "e": 19.06707747893844,
+      "solved": 39.13671059289322,
+      "variance_ratio_at_1": 1.0390417836369934,
+      "sessions": 47507,
+      "impressions_per_session": 3.104531963710611,
+      "seen_from_an_impression": 18.16106504302074
+     }
+    }
+   },
+   "bts": {
+    "5.5": {
+     "1": {
+      "e": 18.19917895533529,
+      "solved": 27.174088210443156,
+      "variance_ratio_at_1": 1.3860053805182075,
+      "sessions": 483356,
+      "impressions_per_session": 2.62396866905552,
+      "seen_from_an_impression": 5.334252403393174
+     },
+     "2": {
+      "e": 18.19917895533529,
+      "solved": 23.102734900989287,
+      "variance_ratio_at_1": 1.1393219328999473,
+      "sessions": 376609,
+      "impressions_per_session": 3.3677129330419615,
+      "seen_from_an_impression": 6.729624674074419
+     },
+     "3": {
+      "e": 18.19917895533529,
+      "solved": 23.929488756592512,
+      "variance_ratio_at_1": 1.0731604497916005,
+      "sessions": 339044,
+      "impressions_per_session": 3.740844846096672,
+      "seen_from_an_impression": 6.827474491666476
+     },
+     "5": {
+      "e": 18.19917895533529,
+      "solved": 24.197057165292716,
+      "variance_ratio_at_1": 1.0344467813697853,
+      "sessions": 292571,
+      "impressions_per_session": 4.335053713457588,
+      "seen_from_an_impression": 7.505234126330214
+     },
+     "10": {
+      "e": 18.19917895533529,
+      "solved": 34.26235004128288,
+      "variance_ratio_at_1": 1.012694806434741,
+      "sessions": 253925,
+      "impressions_per_session": 4.994825243674313,
+      "seen_from_an_impression": 8.086618345185054
+     }
+    },
+    "11": {
+     "1": {
+      "e": 18.19917895533529,
+      "solved": 19.861187250132595,
+      "variance_ratio_at_1": 1.5400387652502725,
+      "sessions": 464753,
+      "impressions_per_session": 2.729000135555876,
+      "seen_from_an_impression": 6.5502853795323075
+     },
+     "2": {
+      "e": 14.256259636169617,
+      "solved": 14.256259636169617,
+      "variance_ratio_at_1": 1.1679916716512335,
+      "sessions": 335371,
+      "impressions_per_session": 3.781814766333404,
+      "seen_from_an_impression": 9.615590340224125
+     },
+     "3": {
+      "e": 13.378702953600719,
+      "solved": 13.378702953600719,
+      "variance_ratio_at_1": 1.097482210823489,
+      "sessions": 278181,
+      "impressions_per_session": 4.559301318206492,
+      "seen_from_an_impression": 11.27736730186839
+     },
+     "5": {
+      "e": 14.179054777677598,
+      "solved": 14.179054777677598,
+      "variance_ratio_at_1": 1.0392933720213828,
+      "sessions": 228846,
+      "impressions_per_session": 5.5422030535818845,
+      "seen_from_an_impression": 11.914706251069335
+     },
+     "10": {
+      "e": 18.059100350162268,
+      "solved": 18.059100350162268,
+      "variance_ratio_at_1": 1.0196714152653041,
+      "sessions": 174725,
+      "impressions_per_session": 7.25889826870797,
+      "seen_from_an_impression": 13.747364014031259
+     }
+    },
+    "22": {
+     "1": {
+      "e": 8.514423305056546,
+      "solved": 8.514423305056546,
+      "variance_ratio_at_1": 1.5318738193936596,
+      "sessions": 444945,
+      "impressions_per_session": 2.8504893863286473,
+      "seen_from_an_impression": 12.639405477047822
+     },
+     "2": {
+      "e": 10.6274768252808,
+      "solved": 10.6274768252808,
+      "variance_ratio_at_1": 1.2485984316641454,
+      "sessions": 325455,
+      "impressions_per_session": 3.8970395292744007,
+      "seen_from_an_impression": 12.06313829967571
+     },
+     "3": {
+      "e": 8.905277412332316,
+      "solved": 8.905277412332316,
+      "variance_ratio_at_1": 1.1013749992717998,
+      "sessions": 261852,
+      "impressions_per_session": 4.843617768815973,
+      "seen_from_an_impression": 15.228134897513307
+     },
+     "5": {
+      "e": 8.259935930389748,
+      "solved": 8.259935930389748,
+      "variance_ratio_at_1": 1.0384903652019373,
+      "sessions": 197367,
+      "impressions_per_session": 6.426155334985078,
+      "seen_from_an_impression": 19.637017261539164
+     },
+     "10": {
+      "e": 9.768670404739183,
+      "solved": 9.768670404739183,
+      "variance_ratio_at_1": 1.014023594073007,
+      "sessions": 140341,
+      "impressions_per_session": 9.037351878638459,
+      "seen_from_an_impression": 22.509861540268908
+     }
+    },
+    "44": {
+     "1": {
+      "e": 8.514423305056546,
+      "solved": 8.514423305056546,
+      "variance_ratio_at_1": 1.5318738193936596,
+      "sessions": 444945,
+      "impressions_per_session": 2.8504893863286473,
+      "seen_from_an_impression": 12.639405477047822
+     },
+     "2": {
+      "e": 4.649963326209232,
+      "solved": 4.649963326209232,
+      "variance_ratio_at_1": 1.3404164579424667,
+      "sessions": 315410,
+      "impressions_per_session": 4.021150248882407,
+      "seen_from_an_impression": 24.28280051186184
+     },
+     "3": {
+      "e": 5.53365486721605,
+      "solved": 5.53365486721605,
+      "variance_ratio_at_1": 1.0969347483572833,
+      "sessions": 255111,
+      "impressions_per_session": 4.971604517249355,
+      "seen_from_an_impression": 22.10563733973765
+     },
+     "5": {
+      "e": 5.144393793253853,
+      "solved": 5.144393793253853,
+      "variance_ratio_at_1": 1.0404168661231632,
+      "sessions": 189323,
+      "impressions_per_session": 6.699191329104229,
+      "seen_from_an_impression": 28.363996685355563
+     },
+     "10": {
+      "e": 5.9466364064547355,
+      "solved": 5.9466364064547355,
+      "variance_ratio_at_1": 1.0147832894899813,
+      "sessions": 124175,
+      "impressions_per_session": 10.2138997382726,
+      "seen_from_an_impression": 37.875873504211505
+     }
+    }
+   }
+  },
+  "largest_impression": {
+   "random": {
+    "rows": 7,
+    "clicks": 5,
+    "pairs": 10.0,
+    "share_of_pairs": 0.0364963503649635,
+    "excess_without": 18.33551178688392
+   },
+   "bts": {
+    "rows": 50,
+    "clicks": 48,
+    "pairs": 1128.0,
+    "share_of_pairs": 0.23847780126849893,
+    "excess_without": 13.623660422712423
+   }
+  }
+ },
+ "women": {
+  "sessions": {
+   "random": {
+    "5.5": {
+     "1": {
+      "e": 11.075358296911567,
+      "solved": 58.6881434438677,
+      "variance_ratio_at_1": 1.0733723718093064,
+      "sessions": 158281,
+      "impressions_per_session": 1.7703388277809717,
+      "seen_from_an_impression": 3.451317043228139
+     },
+     "2": {
+      "e": 11.075358296911567,
+      "solved": 44.97287755722277,
+      "variance_ratio_at_1": 1.0218367767870231,
+      "sessions": 126717,
+      "impressions_per_session": 2.2113133991492853,
+      "seen_from_an_impression": 4.3371423677157575
+     },
+     "3": {
+      "e": 11.075358296911567,
+      "solved": 39.026260993871624,
+      "variance_ratio_at_1": 1.0233413995195735,
+      "sessions": 108816,
+      "impressions_per_session": 2.5750900602852522,
+      "seen_from_an_impression": 5.180813743928682
+     },
+     "5": {
+      "e": 11.075358296911567,
+      "solved": 35.83780390711807,
+      "variance_ratio_at_1": 1.0113691007910208,
+      "sessions": 91425,
+      "impressions_per_session": 3.064927536231884,
+      "seen_from_an_impression": 6.178390569963349
+     },
+     "10": {
+      "e": 11.075358296911567,
+      "solved": 49.925400967263954,
+      "variance_ratio_at_1": 1.004904331022106,
+      "sessions": 76785,
+      "impressions_per_session": 3.649293481799831,
+      "seen_from_an_impression": 6.570238141971585
+     }
+    },
+    "11": {
+     "1": {
+      "e": 11.075358296911567,
+      "solved": 58.6881434438677,
+      "variance_ratio_at_1": 1.0733723718093064,
+      "sessions": 158281,
+      "impressions_per_session": 1.7703388277809717,
+      "seen_from_an_impression": 3.451317043228139
+     },
+     "2": {
+      "e": 11.075358296911567,
+      "solved": 29.41952900316834,
+      "variance_ratio_at_1": 1.0181110136504863,
+      "sessions": 122215,
+      "impressions_per_session": 2.2927709364644273,
+      "seen_from_an_impression": 5.933111119834696
+     },
+     "3": {
+      "e": 11.075358296911567,
+      "solved": 32.647485752974816,
+      "variance_ratio_at_1": 1.0250922169474281,
+      "sessions": 105830,
+      "impressions_per_session": 2.647746385712936,
+      "seen_from_an_impression": 5.986556559164344
+     },
+     "5": {
+      "e": 11.075358296911567,
+      "solved": 28.300493047883663,
+      "variance_ratio_at_1": 1.0135467017945208,
+      "sessions": 84289,
+      "impressions_per_session": 3.3244076925814756,
+      "seen_from_an_impression": 7.919507085731824
+     },
+     "10": {
+      "e": 11.075358296911567,
+      "solved": 26.57078907014834,
+      "variance_ratio_at_1": 1.006065110103362,
+      "sessions": 61543,
+      "impressions_per_session": 4.553092959394244,
+      "seen_from_an_impression": 11.204859909139898
+     }
+    },
+    "22": {
+     "1": {
+      "e": 11.075358296911567,
+      "solved": 58.6881434438677,
+      "variance_ratio_at_1": 1.0733723718093064,
+      "sessions": 158281,
+      "impressions_per_session": 1.7703388277809717,
+      "seen_from_an_impression": 3.451317043228139
+     },
+     "2": {
+      "e": 11.075358296911567,
+      "solved": 29.41952900316834,
+      "variance_ratio_at_1": 1.0181110136504863,
+      "sessions": 122215,
+      "impressions_per_session": 2.2927709364644273,
+      "seen_from_an_impression": 5.933111119834696
+     },
+     "3": {
+      "e": 11.075358296911567,
+      "solved": 21.786691495168917,
+      "variance_ratio_at_1": 1.0346354247845229,
+      "sessions": 102675,
+      "impressions_per_session": 2.729106403700998,
+      "seen_from_an_impression": 8.383386091195563
+     },
+     "5": {
+      "e": 11.075358296911567,
+      "solved": 16.66744461810567,
+      "variance_ratio_at_1": 1.0200684991896838,
+      "sessions": 80470,
+      "impressions_per_session": 3.482179694296011,
+      "seen_from_an_impression": 13.267177234298439
+     },
+     "10": {
+      "e": 11.075358296911567,
+      "solved": 24.092232034818398,
+      "variance_ratio_at_1": 1.0098846825731778,
+      "sessions": 57893,
+      "impressions_per_session": 4.840153386419774,
+      "seen_from_an_impression": 14.655730859959101
+     }
+    },
+    "44": {
+     "1": {
+      "e": 11.075358296911567,
+      "solved": 58.6881434438677,
+      "variance_ratio_at_1": 1.0733723718093064,
+      "sessions": 158281,
+      "impressions_per_session": 1.7703388277809717,
+      "seen_from_an_impression": 3.451317043228139
+     },
+     "2": {
+      "e": 11.075358296911567,
+      "solved": 29.41952900316834,
+      "variance_ratio_at_1": 1.0181110136504863,
+      "sessions": 122215,
+      "impressions_per_session": 2.2927709364644273,
+      "seen_from_an_impression": 5.933111119834696
+     },
+     "3": {
+      "e": 11.075358296911567,
+      "solved": 21.786691495168917,
+      "variance_ratio_at_1": 1.0346354247845229,
+      "sessions": 102675,
+      "impressions_per_session": 2.729106403700998,
+      "seen_from_an_impression": 8.383386091195563
+     },
+     "5": {
+      "e": 11.075358296911567,
+      "solved": 16.66744461810567,
+      "variance_ratio_at_1": 1.0200684991896838,
+      "sessions": 80470,
+      "impressions_per_session": 3.482179694296011,
+      "seen_from_an_impression": 13.267177234298439
+     },
+     "10": {
+      "e": 11.075358296911567,
+      "solved": 17.036113490224512,
+      "variance_ratio_at_1": 1.022648859226574,
+      "sessions": 55883,
+      "impressions_per_session": 5.0142440455952615,
+      "seen_from_an_impression": 25.32145062113907
+     }
+    }
+   },
+   "bts": {
+    "5.5": {
+     "1": {
+      "e": 9.306532295758975,
+      "solved": 27.08270273215541,
+      "variance_ratio_at_1": 1.2279947543398446,
+      "sessions": 694345,
+      "impressions_per_session": 3.575476168187284,
+      "seen_from_an_impression": 6.80097429564161
+     },
+     "2": {
+      "e": 9.306532295758975,
+      "solved": 24.451947107843775,
+      "variance_ratio_at_1": 1.0894220231476945,
+      "sessions": 559167,
+      "impressions_per_session": 4.439843552999372,
+      "seen_from_an_impression": 7.839212217445
+     },
+     "3": {
+      "e": 9.306532295758975,
+      "solved": 25.09567911885003,
+      "variance_ratio_at_1": 1.0428311153299932,
+      "sessions": 521317,
+      "impressions_per_session": 4.762196513829397,
+      "seen_from_an_impression": 8.081000912747612
+     },
+     "5": {
+      "e": 9.306532295758975,
+      "solved": 28.116069189204907,
+      "variance_ratio_at_1": 1.0172493853116216,
+      "sessions": 489184,
+      "impressions_per_session": 5.0750106299470135,
+      "seen_from_an_impression": 8.173572693942756
+     },
+     "10": {
+      "e": 9.306532295758975,
+      "solved": 39.47638010168093,
+      "variance_ratio_at_1": 1.0058119141039192,
+      "sessions": 452198,
+      "impressions_per_session": 5.490103892542647,
+      "seen_from_an_impression": 8.40965127885366
+     }
+    },
+    "11": {
+     "1": {
+      "e": 9.306532295758975,
+      "solved": 13.941013183948712,
+      "variance_ratio_at_1": 1.4680002901041835,
+      "sessions": 560178,
+      "impressions_per_session": 4.431830596703191,
+      "seen_from_an_impression": 11.974440650056755
+     },
+     "2": {
+      "e": 9.306532295758975,
+      "solved": 14.234084254306417,
+      "variance_ratio_at_1": 1.1242465962161072,
+      "sessions": 438075,
+      "impressions_per_session": 5.667098099640473,
+      "seen_from_an_impression": 12.518189295637582
+     },
+     "3": {
+      "e": 9.306532295758975,
+      "solved": 13.961500331221252,
+      "variance_ratio_at_1": 1.0712835170182264,
+      "sessions": 372157,
+      "impressions_per_session": 6.670878150887932,
+      "seen_from_an_impression": 13.632832168029344
+     },
+     "5": {
+      "e": 9.306532295758975,
+      "solved": 14.418508645111435,
+      "variance_ratio_at_1": 1.0324863876428694,
+      "sessions": 315177,
+      "impressions_per_session": 7.876888224711829,
+      "seen_from_an_impression": 14.910779525129561
+     },
+     "10": {
+      "e": 9.306532295758975,
+      "solved": 21.27720811036043,
+      "variance_ratio_at_1": 1.0092719733206361,
+      "sessions": 276112,
+      "impressions_per_session": 8.991329605377528,
+      "seen_from_an_impression": 15.081518109540992
+     }
+    },
+    "22": {
+     "1": {
+      "e": 9.306532295758975,
+      "solved": 10.26651707047156,
+      "variance_ratio_at_1": 1.6554736409129018,
+      "sessions": 540640,
+      "impressions_per_session": 4.591990973660846,
+      "seen_from_an_impression": 15.041105061036472
+     },
+     "2": {
+      "e": 7.338817579563337,
+      "solved": 7.338817579563337,
+      "variance_ratio_at_1": 1.191036737738177,
+      "sessions": 365236,
+      "impressions_per_session": 6.797287233460009,
+      "seen_from_an_impression": 22.838380030081197
+     },
+     "3": {
+      "e": 7.476665194491946,
+      "solved": 7.476665194491946,
+      "variance_ratio_at_1": 1.108203428358418,
+      "sessions": 300855,
+      "impressions_per_session": 8.25186219275066,
+      "seen_from_an_impression": 24.06083990503558
+     },
+     "5": {
+      "e": 8.125357088265943,
+      "solved": 8.125357088265943,
+      "variance_ratio_at_1": 1.0434125436172235,
+      "sessions": 241406,
+      "impressions_per_session": 10.283978028715111,
+      "seen_from_an_impression": 24.915257869326442
+     },
+     "10": {
+      "e": 9.306532295758975,
+      "solved": 10.834059598299707,
+      "variance_ratio_at_1": 1.0172086245850698,
+      "sessions": 182010,
+      "impressions_per_session": 13.639986813911323,
+      "seen_from_an_impression": 28.403237877495254
+     }
+    },
+    "44": {
+     "1": {
+      "e": 6.66582373367988,
+      "solved": 6.66582373367988,
+      "variance_ratio_at_1": 1.8576161122967796,
+      "sessions": 530616,
+      "impressions_per_session": 4.678739427382514,
+      "seen_from_an_impression": 21.16937631061454
+     },
+     "2": {
+      "e": 5.479072511020787,
+      "solved": 5.479072511020787,
+      "variance_ratio_at_1": 1.1931085822616605,
+      "sessions": 355240,
+      "impressions_per_session": 6.9885542168674695,
+      "seen_from_an_impression": 28.964344839753583
+     },
+     "3": {
+      "e": 4.675522059154603,
+      "solved": 4.675522059154603,
+      "variance_ratio_at_1": 1.1085454115180549,
+      "sessions": 277338,
+      "impressions_per_session": 8.951582545486014,
+      "seen_from_an_impression": 36.67806674738804
+     },
+     "5": {
+      "e": 4.313643091761176,
+      "solved": 4.313643091761176,
+      "variance_ratio_at_1": 1.0377665552517759,
+      "sessions": 205392,
+      "impressions_per_session": 12.087199111942043,
+      "seen_from_an_impression": 45.95738362870748
+     },
+     "10": {
+      "e": 5.999631873485609,
+      "solved": 5.999631873485609,
+      "variance_ratio_at_1": 1.0184412680839907,
+      "sessions": 143893,
+      "impressions_per_session": 17.253195082457104,
+      "seen_from_an_impression": 48.239530591545844
+     }
+    }
+   }
+  },
+  "largest_impression": {
+   "random": {
+    "rows": 6,
+    "clicks": 4,
+    "pairs": 6.0,
+    "share_of_pairs": 0.022222222222222223,
+    "excess_without": 10.807347636152624
+   },
+   "bts": {
+    "rows": 10,
+    "clicks": 8,
+    "pairs": 28.0,
+    "share_of_pairs": 0.006928977975748577,
+    "excess_without": 9.235159794653734
+   }
+  }
+ }
+}

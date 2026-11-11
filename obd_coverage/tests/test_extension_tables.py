@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from obd_coverage import extension_tables as tables
 from obd_coverage import run
 from obd_coverage.extension import RESULTS
@@ -50,3 +52,18 @@ def test_a_registered_scenario_stands_beside_its_variants():
     ]
     cell = published["men"]["M"]["cells"]["ips_ratio"]["rows"]
     assert f"{cell['coverage']:.3f} (-) / {cell['predicted_coverage']:.3f}" in lines[0]
+
+
+def test_the_sessions_described_afterwards_are_those_of_the_calibration():
+    calibration, described = load("calibration.json"), load("posthoc.json")
+    for campaign in run.PRIMARY + ("men",):
+        for log, measured in calibration[campaign]["direct"]["double_clicks"].items():
+            fitted = measured["sessions"]
+            at = described[campaign]["sessions"][log][f"{fitted['size']:g}"]
+            assert at[str(fitted["minutes"])]["solved"] == pytest.approx(
+                fitted["solved"], rel=1e-12
+            )
+            largest = described[campaign]["largest_impression"][log]
+            assert largest["pairs"] / largest["share_of_pairs"] == pytest.approx(measured["pairs"])
+    lines = rows(tables.session_table(described, calibration))
+    assert [line[2] for line in lines] == ["44", "22", "44", "22", "44", "11"]  # nominal sizes

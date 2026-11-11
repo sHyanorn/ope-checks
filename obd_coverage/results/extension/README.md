@@ -4,6 +4,7 @@ The extension of [`obd_coverage`](../../README.md) registered in [`EXTENSION.md`
 
 - `calibration.json`: the direct measurements on the real clicks, every parameter, the true values and the predicted coverage of every cell, committed before any click was generated (`2e4eee4`, from code `c7609da`).
 - `coverage.json`: every cell, the fit of F, the block residuals of every scenario and the registered reading; `cells.md`: one line per cell, and the cells whose prediction missed; `residuals.md`: D3 by block length.
+- `posthoc.json`: written after the reading, descriptive and no part of the registration: the sessions that the rule of Section 3 forms at every size and span, and the impression with the most double clicks of each log.
 
 The direct measurements read real clicks. With respect to `obd` they are post hoc and descriptive, and nothing here is a verdict on it. No registered file, result or label of `obd` or of the coverage study changes.
 
@@ -13,9 +14,10 @@ The three results of the coverage study that the extension tests, on the IPS rat
 
 - R1, R2 and R3 are robust by the registered criterion: every label is the registered one in every variant on both campaigns.
 - In F, the scenario fitted to the direct measurements, every block length is adequate on both campaigns (R2). Rows and impressions under-cover on All, at 0.905 and 0.910 against 0.866 and 0.880 in M. On Women's they are unresolved, at 0.922 and 0.928 against 0.846 and 0.860 in M: R1 has another label there, which the registration counts against it.
-- F is not a close description of the logs. It reproduces 16 of 25 statistics on All and 11 on Women's, and on no campaign the published ratio of ten-minute blocks to rows (1.37, 1.45 and 1.47, against 97.5th percentiles of 1.26, 1.21 and 1.26 in F). Its coverage with rows is that of a scenario whose intervals widen less from rows to blocks than those of the logs.
+- F is not a close description of the logs. It reproduces 16 of 25 statistics on All and 11 on Women's, and on no campaign the published ratio of ten-minute blocks to rows (1.37, 1.45 and 1.47, against 97.5th percentiles of 1.26, 1.21 and 1.26 in F). Its coverage with rows is that of a scenario whose intervals widen less from rows to blocks than those of the logs, and whose sessions in the random logs hold 1.5 to 2.0 impressions on average.
 - With dependence across an hour built on F (FH), ten-minute blocks under-cover: 0.914 on All and 0.830 on Women's (R3).
-- Dependence beyond ten minutes and a drift that the logs do not share are not separated on either campaign: the real `G(180)`, 0.199 on All and 0.315 on Women's, lies inside both registered ranges. The two explanations of the widening on Women's imply different things for its ten-minute blocks, a coverage of 0.830 (FH) or of 0.960 (FS), and the extension does not say which holds.
+- Dependence beyond ten minutes and a drift that the logs do not share are not separated on either campaign: the real `G(180)`, 0.199 on All and 0.315 on Women's, lies inside both registered ranges. On Women's this label rests on one scenario: the real value lies above the 97.5th percentile of FH (0.311) and of FD (0.310) and below that of FU (0.342), which was cut back; with FH and FD alone the label would have been "more like a drift". The two scenarios that match the widening on Women's imply different things for its ten-minute blocks, a coverage of 0.830 with dependence across an hour (FH) and of 0.960 with a drift in the BTS log (FS), and the extension does not say which holds.
+- By D3 the groupings of the registered M and H, on which R1 to R3 rest, differ from the logs: their sessions join clicks of different user types, and the real `G` at ten minutes, 0.079 on All and -0.010 on Women's, lies below its range in each of their six variants (2.5th percentiles of 0.150 and above). `G` was not computed for M and H themselves; the two variants with the two-level factor have their groupings and strengths.
 
 ## Direct measurements on the real clicks
 
@@ -30,7 +32,16 @@ D1, double clicks. `N2` is the number of pairs of clicked rows in one impression
 | Men's | random | 274 | 13.7 | 19.1 (12.8 to 26.6) | 16.2 |
 | Men's | bts | 4730 | 246.4 | 18.2 (10.9 to 29.2) | 16.2 |
 
-The registered `e_I`, one per campaign, was solved from the published ratio of standard deviations between impressions and rows. On All and Women's it is 2.2 to 3.9 times the measured excess and lies above the interval of either log; on Men's it lies inside both.
+The registered `e_I`, one per campaign, was solved from the published ratio of standard deviations between impressions and rows. On All and Women's it is 2.2 to 3.9 times the measured excess and lies above the interval of either log; on Men's it lies inside both. In the BTS log of Men's one impression of 50 rows with 48 clicks gives 1,128 of the 4,730 pairs (24%), and without it `e_I^` is 13.6; in the other five logs the largest impression gives at most 3.6% of the pairs (`posthoc.json`, not registered):
+
+| Campaign | Log | rows | clicks | pairs | share of `N2` | `e_I^` | without it |
+|---|---|---|---|---|---|---|---|
+| All | random | 10 | 4 | 6 | 2.0% | 13.4 | 13.1 |
+| All | bts | 12 | 11 | 55 | 1.0% | 10.5 | 10.4 |
+| Women's | random | 6 | 4 | 6 | 2.2% | 11.1 | 10.8 |
+| Women's | bts | 10 | 8 | 28 | 0.7% | 9.3 | 9.2 |
+| Men's | random | 7 | 5 | 10 | 3.6% | 19.1 | 18.3 |
+| Men's | bts | 50 | 48 | 1128 | 23.8% | 18.2 | 13.6 |
 
 D2, the variance ratio of `obd.posthoc.units` by block length, with intervals over resamples of the pairs of adjacent blocks:
 
@@ -72,9 +83,9 @@ From ten to 180 minutes `V` grows by 28% on All and by 72% on Women's while `W` 
 
 ## The scenarios
 
-F and the scenarios built on it. Size is the number of impressions of a session, `T` its span in minutes; a value in brackets was solved and cut back by the nesting, as registered.
+F and the scenarios built on it. The nominal size is the number of impressions that the rule of Section 3 aims at for a session, `T` its span in minutes; a value in brackets was solved and cut back by the nesting, as registered.
 
-| Campaign | Scenario | random: size | `T` | `e_I` | `e_S` | bts: size | `T` | `e_I` | `e_S` | sessions per long group | `e_L` | `k` of `k_max` | true IPS ratio | largest probability |
+| Campaign | Scenario | random: nominal size | `T` | `e_I` | `e_S` | bts: nominal size | `T` | `e_I` | `e_S` | sessions per long group | `e_L` | `k` of `k_max` | true IPS ratio | largest probability |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | All | F | 44 | 1 | 13.4 | 13.4 (solved 24.8) | 22 | 2 | 10.5 | 5.7 |  |  |  | 0.9907 | 0.090 |
 | All | FH | 44 | 1 | 13.4 | 13.4 (solved 24.8) | 22 | 2 | 10.5 | 5.7 | 6 | 4.2 |  | 0.9907 | 0.090 |
@@ -95,10 +106,23 @@ F and the scenarios built on it. Size is the number of impressions of a session,
 | Men's | S |  |  |  |  |  |  |  |  |  |  | 0.42 of 4.22 | 0.9215 | 0.010 |
 | Men's | FD | 44 | 1 | 19.1 | 19.1 (solved 119.7) | 11 | 2 | 18.2 | 14.3 |  |  | as D | 0.9190 | 0.230 |
 
-- F. In the random log of every campaign the solved `e_S` exceeds `e_I` at every session size up to 44, so 44 is used and `e_S` is cut back to `e_I`. In the BTS logs nothing is cut back.
+- F. In the random log of every campaign the solved `e_S` exceeds `e_I` at every nominal size, at the span that the one-minute ratio chooses, so 44 is used and `e_S` is cut back to `e_I`. In the BTS logs nothing is cut back.
 - FH and FU match the published widening at 180 minutes (1.134, 1.365, 1.029) with long groups of 60 minutes and of 24 hours within a user type. FH is not cut back. FU is cut back on All and Women's with 24 sessions to a long group, and is weaker there than the number it was solved from.
 - FS and S match the same number with a drift in the BTS log only, of the shape fitted in the coverage study, FS on top of F and S with independent clicks. The amplitude stays below `k_max` on every campaign.
 - FD is F with the drift of scenario D in both logs.
+
+The sessions of F (`posthoc.json`, not registered). "Seen from an impression" is the mean size of the session that an impression is in; the last column is the smallest `e_S` that any size and span solves to.
+
+| Campaign | Log | nominal size | `T` | impressions per session | as seen from an impression | `e_I` | solved `e_S` | one-minute ratio: fitted | real | smallest solved `e_S` (where, its one-minute ratio) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| All | random | 44 | 1 | 2.03 | 6.4 | 13.4 | 24.8 | 1.38 | 1.29 | 5.3 (size 44, 5 min, 1.02) |
+| All | bts | 22 | 2 | 6.81 | 20.9 | 10.5 | 5.7 | 1.13 | 1.14 | 3.2 (size 44, 2 min, 1.17) |
+| Women's | random | 44 | 1 | 1.77 | 3.5 | 11.1 | 58.7 | 1.07 | 1.13 | 16.7 (size 22, 5 min, 1.02) |
+| Women's | bts | 22 | 2 | 6.80 | 22.8 | 9.3 | 7.3 | 1.19 | 1.16 | 4.3 (size 44, 5 min, 1.04) |
+| Men's | random | 44 | 1 | 1.50 | 2.7 | 19.1 | 119.7 | 1.15 | 1.18 | 35.2 (size 22, 5 min, 1.04) |
+| Men's | bts | 11 | 2 | 3.78 | 9.6 | 18.2 | 14.3 | 1.17 | 1.20 | 4.6 (size 44, 2 min, 1.34) |
+
+A user type gets at least one label, and in the random logs nearly every type has only one at a span of one minute. The ladder of sizes therefore does not enlarge the sessions there: at one minute the number of sessions and the solved `e_S` are the same at all four nominal sizes on Women's and Men's, and at 11, 22 and 44 on All. The sessions of F hold 2.0, 1.8 and 1.5 impressions on average in the random logs of All, Women's and Men's, and 6.8, 6.8 and 3.8 in the BTS logs. The rule tests the solved `e_S` at the span that the one-minute ratio chooses. Over all sizes and spans, no combination solves to an `e_S` at or below `e_I` in the random log of Women's or Men's (smallest 16.7 against 11.1, and 35.2 against 19.1). On All five do, the nominal sizes 22 and 44 at two minutes (12.5 against 13.4) and 44 at three, five and ten minutes, with one-minute ratios of 1.01 to 1.08 against the real 1.29.
 
 The variants of Section 5, beside the registered M and H:
 
@@ -168,8 +192,9 @@ Each statistic of the real logs beside its 2.5th to 97.5th percentile over the d
 - It reproduces the published ratio of impressions to rows on every campaign, and on no campaign the published ratio of ten-minute blocks to rows: 1.37, 1.45 and 1.47 against upper ends of 1.26, 1.21 and 1.26 (medians 1.16, 1.12 and 1.16). In the registered M the range held the published ratio on All and Women's (1.23 to 1.43 and 1.26 to 1.46).
 - In the BTS logs its variance ratio at two minutes is above the real one on every campaign and its ratio at 60 or 180 minutes below it (All at 60 and 180, Women's at 30 and 60, Men's at 180): sessions of two minutes put the dependence at shorter spans than the logs show.
 - On Women's it does not reproduce the published widening at 30 and at 180 minutes (1.095 against 1.092, 1.365 against 1.227), as M did not at 180.
+- The ranges of D1 and D2 rest on 400 data sets. Three statistics lie within 0.003 of an end of their range: on Women's the variance ratio of the BTS log at 30 minutes and "30 minutes over ten", both outside, and on All the one-minute variance ratio of the random log, inside. The counts could differ by one or two in another run.
 
-F therefore shows less widening from rows to ten-minute blocks than the logs do, whether that widening in the logs is dependence or a click rate that moves between blocks. Within this click model, where a session cannot be stronger than an impression, the measured excess within an impression does not produce the measured ten-minute variance ratio of the random log on any campaign through sessions of at most 44 impressions.
+F therefore shows less widening from rows to ten-minute blocks than the logs do, whether that widening in the logs is dependence or a click rate that moves between blocks. Within this click model, where a session cannot be stronger than an impression, the sessions that the registered rule forms in the random logs do not produce the measured ten-minute variance ratio from the measured excess within an impression.
 
 ## Results: the IPS ratio
 
@@ -254,15 +279,17 @@ Confirmatory, on the IPS ratio on All and Women's. Coverage with its Wilson inte
 | All | 0.199 | -0.550 to 0.297 | -0.313 to 0.412 | no | not separated, inside both ranges |
 | Women's | 0.315 | -0.611 to 0.342 | 0.127 to 0.600 | no | not separated, inside both ranges |
 
-Both campaigns are "not separated", with the real value inside both ranges, and on neither are the two ranges apart. On Women's the real value, 0.315, is 0.027 below the upper end of the range within types (0.342) and below the median under a drift (0.42).
+Both campaigns are "not separated", with the real value inside both ranges, and on neither are the two ranges apart. On Women's the upper end of the range within types, 0.342, is the 97.5th percentile of FU; those of FH and FD are 0.311 and 0.310. The real value, 0.315, lies above both, 0.028 below that of FU, and below the median under a drift (0.42). FU on Women's is cut back (`e_L` 23.3 to 7.3), and the median of its ratio of standard deviations at 180 minutes is 1.102 against the 1.365 it was solved from. With the range within types taken from FH and FD alone, the real value would lie above it and inside the range under a drift, which Section 4 labels "more like a drift". The registered range includes FU, and the registered label is "not separated".
 
 What the registration counts against the three results:
 
-- R1 or R2 not robust, or with another label in F. Both are robust, and R2 has its labels in F. R1 has them in F on All and not on Women's. By the registration R1 then does not hold on Women's at the dependence measured directly: at F, rows and impressions on Women's are not shown to under-cover. This is read with the fit above: F does not reproduce the published ratio of ten-minute blocks to rows, the statistic closest to R1, on any campaign.
+- R1 or R2 not robust, or with another label in F. Both are robust, and R2 has its labels in F. R1 has them in F on All and not on Women's, where rows and impressions are unresolved. By the registration R1 then depends on a choice of the model or does not hold at the dependence measured directly; this is so on Women's.
 - R3 not robust, or ten-minute blocks not under-covering in FH. Neither is found.
-- Women's labelled "more like a drift". Not found.
+- Women's labelled "more like a drift". Not found; item 4 says how near the label is.
 
 What it counts for them, R1 to R3 robust and with the same labels in F and FH, holds for R2 and R3, and for R1 on All. "Not separated" leaves the statement of the coverage study on Women's as it is: its ten-minute intervals are not shown to cover.
+
+Not part of the registered reading: F does not reproduce the published ratio of ten-minute blocks to rows on any campaign ("What F reproduces"), so its labels for rows and impressions are those of a scenario whose intervals widen less from rows to blocks than the published ones.
 
 ## Descriptive results
 
@@ -297,8 +324,8 @@ What it counts for them, R1 to R3 robust and with the same labels in F and FH, h
 | Women's | H.two-level | 0.39 (0.31 to 0.47) | 0.44 (0.36 to 0.53) | 0.51 (0.40 to 0.60) | 0.54 (0.44 to 0.64) | 0.60 (0.47 to 0.70) | 0.64 (0.43 to 0.76) |
 | Women's | FD | -0.00 (-0.07 to 0.07) | -0.00 (-0.11 to 0.09) | -0.01 (-0.15 to 0.13) | -0.01 (-0.18 to 0.15) | -0.01 (-0.28 to 0.21) | -0.04 (-0.61 to 0.31) |
 
-- A drift in one log accounts for the published widening with a median `G(180)` of 0.15 on All and 0.42 on Women's (FS). Without a movement of one log against the other the 97.5th percentile of `G(180)` is 0.27 to 0.34 (FH, FU, FD). The ranges overlap on both campaigns, as the registration expected for All and allowed for Women's.
-- The registered M and H form sessions without regard to user types, and their variants have a `G` of 0.24 to 0.46 at ten minutes (medians). The real `G(10)`, 0.079 on All and -0.010 on Women's, lies below the 2.5th percentile of every one of these variants and inside the range of F, of every scenario built on it and of S. By D3, a dependence between user types as strong as these groupings carry is not in the real clicks at ten minutes.
+- The drift in one log that matches the published widening has a median `G(180)` of 0.15 on All and 0.42 on Women's (FS). Without a movement of one log against the other the 97.5th percentile of `G(180)` is 0.27 to 0.34 (FH, FU, FD). The ranges overlap on both campaigns, as the registration expected for All and allowed for Women's.
+- The registered M and H form sessions without regard to user types, and their variants have a `G` of 0.24 to 0.46 at ten minutes (medians). The real `G(10)`, 0.079 on All and -0.010 on Women's, lies below the 2.5th percentile of every one of these variants (0.150 at the lowest) and inside the range of F, of every scenario built on it and of S; on All it is 0.008 below the upper end of the range of FH (0.088). Under the assumptions of D3 the logs differ in this respect from the six variants, and so from the groupings of the registered M and H.
 
 The standard deviation of the replicates of the IPS ratio over the one at ten minutes (median, 2.5th to 97.5th percentile over the data sets):
 
@@ -332,7 +359,7 @@ The standard deviation of the replicates of the IPS ratio over the one at ten mi
 | Men's | published | 0.978 | 0.978 | 1.007 | 1.029 |
 
 - The published ratios at 20, 30, 60 and 180 minutes lie inside the ranges of FH, FU and FS on both campaigns, so the shape of the widening by block length does not separate dependence from drift either. On Women's the published ratio at 60 minutes, 1.123, is at the lower end of FH (1.111 to 1.411) and near the median of FS (1.138).
-- Under a drift, blocks cover at least as often as nominal and more so the longer they are, as Section 4 expected. In FS ten-minute blocks cover 0.952 on All and 0.960 on Women's, and 180-minute blocks 0.969 and 0.993, the last over-covering. In S, with independent clicks, rows are adequate (0.952 and 0.950) and 180-minute blocks are unresolved on All (0.973) and over-cover on Women's (0.993). In FS rows cover 0.909 and 0.922, as in F (0.905 and 0.922).
+- Section 4 expected blocks to cover at least as often as nominal under a drift, more so the longer they are. In FS and S, for the IPS ratio, no block length under-covers and 180-minute blocks cover more than five-minute blocks (FS 0.952 and 0.969 on All, 0.956 and 0.993 on Women's; S 0.954 and 0.973, 0.957 and 0.993); the coverage does not rise at every step (FS on All is 0.952 at 5, 10 and 20 minutes). In FS ten-minute blocks cover 0.952 on All and 0.960 on Women's, and 180-minute blocks over-cover on Women's. In S, with independent clicks, rows are adequate (0.952 and 0.950) and 180-minute blocks are unresolved on All (0.973) and over-cover on Women's (0.993). In FS rows cover 0.909 and 0.922, as in F (0.905 and 0.922).
 - Men's. In F rows under-cover (0.908), impressions are unresolved (0.918) and every block length is adequate (0.941 to 0.948). The real `G(180)`, -0.196, lies inside the range of F (-0.557 to 0.286).
 - The click rate of the BTS log. With the drift in that log, blocks over-cover from ten minutes in FS (0.986 on All, 0.989 on Women's) and from five in S. In FH ten-minute blocks cover 0.758 on All and 0.603 on Women's. `cells.md` has every quantity.
 
@@ -353,12 +380,14 @@ The prediction lies outside the Wilson interval of the simulated coverage in 113
 ## Where the implementation settles what the registration leaves open
 
 - FU. Section 6 says FU is simulated without intervals, and Section 4 asks for the standard deviations of its replicates. Its 1,000 data sets got replicates; only ratios of their standard deviations are reported, and no coverage.
-- Session sizes. The size of a session is chosen per log, as `e_I` and `e_S` are; the size of a long group per campaign.
+- Session sizes. The size of a session is chosen per log, as `e_I` and `e_S` are; the size of a long group per campaign. Within each nominal size the span `T` is the one whose one-minute ratio, with `e_S` cut back, is closest to the published one, and the solved `e_S` is tested against `e_I` at that span only.
 - Drift. FD has the drift of scenario D as the coverage study applied it, in both logs and without rescaling, so its true values are those of D. In FS and S the probabilities of the BTS log are rescaled to their sum, as Section 4 says.
 - Intervals of D2. Each log has one random stream, used for the eight block lengths in increasing order.
 - The stop at a probability above 1 uses an upper bound, the largest click probability of a log times the largest product of its factors, whichever groups are at the high level.
 - Check 1. The data sets are compared at a tolerance of 1e-12, because their last digits depend on the number of threads of the linear algebra; item 1 of the reading gives what was found.
-- The summaries of `V` and `W` within each log for the simulated scenarios were added to the code after the calibration and before the reading (`ef1b885`); they are descriptive.
+- A real value inside exactly one of the two ranges of Section 4 that is labelled "not separated" would be reported as outside both. This did not occur.
+- The summaries of `V` and `W` within each log for the simulated scenarios (`ef1b885`) and the code of the tables (`af23a3c`) were committed after the calibration, while the data sets were being simulated and before any of them was read. They touch neither the clicks, the intervals nor the confirmatory reading.
+- `posthoc.json` (the sessions of F and the largest impressions) was added after the reading. It describes the fit and one measurement and enters no reading.
 - The data sets were simulated by commits `2e4eee4` to `af23a3c`, which do not differ in the code that generates or resamples clicks, in 7.8 CPU hours on four cores; the reduction of Section 9 was not used.
 
 ## What the extension cannot show
