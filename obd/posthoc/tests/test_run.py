@@ -23,3 +23,9 @@ def test_only_quantities_outside_h7_are_compared_with_the_registered_result():
     assert run.differing(registered, post_hoc) == []
     post_hoc["h4.rho.3"] = quantity(1.0, 0.9, 1.1001)
     assert run.differing(registered, post_hoc) == ["h4.rho.3"]
+
+
+def test_load_reads_only_the_columns_asked_for(tmp_path):
+    log(rows(2, minute=0) + rows(1, minute=-1)).to_parquet(tmp_path / "bts_men.parquet")
+    got = run.load(tmp_path, "bts", "men", ["timestamp", "item_id", "position"])
+    assert list(got.columns) == ["timestamp", "item_id", "position"] and len(got) == 2

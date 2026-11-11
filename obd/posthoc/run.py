@@ -1,6 +1,6 @@
 """Run the post hoc analyses.
 
-    python -m obd.posthoc.run                    all four
+    python -m obd.posthoc.run                    all six
     python -m obd.posthoc.run units features     some of them
 
 Results go to obd/posthoc/results/<analysis>.json. The data directory is that of `obd.run`.
@@ -12,10 +12,11 @@ import subprocess
 from pathlib import Path
 
 import numpy as np
+import pyarrow.parquet as pq
 
 from obd import data
 from obd import estimators as est
-from obd.posthoc import blocks, features, propensities, units
+from obd.posthoc import blocks, distances, features, lengths, propensities, units
 from obd.run import POOL
 
 HERE = Path(__file__).parent
@@ -23,9 +24,13 @@ RESULTS = HERE / "results"
 REGISTERED = HERE.parent / "results"
 
 
-def load(data_dir, policy, campaign):
-    """A log, converted if needed, without the rows outside the week."""
-    log = data.read_log(data.to_parquet(data_dir, policy, campaign))
+def load(data_dir, policy, campaign, columns=None):
+    """A log, converted if needed, without the rows outside the week.
+
+    With `columns`, only those are read.
+    """
+    path = data.to_parquet(data_dir, policy, campaign)
+    log = pq.read_table(path, columns=columns).to_pandas() if columns else data.read_log(path)
     since = log["timestamp"] - data.WEEK_START_US
     return log[(since >= 0) & (since < data.N_BLOCKS * data.BLOCK_US)]
 
@@ -111,11 +116,74 @@ def block_lengths(data_dir):
     return {"minutes": blocks.MINUTES, "weights": POOL} | out
 
 
+def registered_quantities(unit, names):
+    """Quantities of a registered result file under the names given: {name: registered name}."""
+    q = json.loads((REGISTERED / f"{unit}.json").read_text())["quantities"]
+    return {name: q[theirs] for name, theirs in names.items()}
+
+
+def other_intervals(data_dir):
+    by_unit, names = {}, {}
+    for stream, campaign in enumerate(data.CAMPAIGNS):
+        random, bts = (load(data_dir, policy, campaign) for policy in ("random", "bts"))
+        pi0 = est.fixed_prior_target(*data.read_prior(data_dir, campaign), stream)
+        width = json.loads((REGISTERED / f"{campaign}.json").read_text())["h4"]["width"]
+        by_unit[campaign] = lengths.by_length(random, bts, pi0, width)
+        names[campaign] = {
+            name: f"{name}.{width}" if name in ("h4.rho", "h4.d") else name
+            for name in by_unit[campaign][blocks.REGISTERED][0]
+        }
+    by_unit["pooled"] = lengths.pooled(by_unit, POOL)
+    names["pooled"] = {name: name for name in lengths.POOLED}
+    out = {unit: lengths.summarise(by_length) for unit, by_length in by_unit.items()}
+    h3 = json.loads((RESULTS / "blocks.json").read_text())
+    for unit, by_length in out.items():
+        moved = differing(registered_quantities(unit, names[unit]), by_length[blocks.REGISTERED])
+        moved += [
+            f"h3.ips at {minutes} minutes"
+            for minutes, q in by_length.items()
+            if not np.allclose(
+                q["h3.ips"]["interval"], h3[unit][str(minutes)]["ips"]["interval"], rtol=1e-9
+            )
+        ]
+        if moved:
+            raise SystemExit(f"{unit}: differs from an earlier result: {moved}")
+    return {"minutes": blocks.MINUTES, "weights": POOL} | out
+
+
+def prior_distances(data_dir):
+    out = {}
+    for stream, campaign in enumerate(data.CAMPAIGNS):
+        alpha, beta = data.read_prior(data_dir, campaign)
+        registered = json.loads((REGISTERED / f"{campaign}.json").read_text())["h1"]
+        targets = {
+            "bts": (est.fixed_prior_target(alpha, beta, stream), registered),
+            "random": (
+                np.full((len(alpha), 3), 1 / len(alpha)),
+                registered["random_log_against_uniform"],
+            ),
+        }
+        out[campaign] = {}
+        for policy, (target, want) in targets.items():
+            log = load(data_dir, policy, campaign, distances.COLUMNS)
+            got = distances.analyse(distances.rows_by_block(log, len(alpha)), target)
+            if not np.allclose(
+                [got["d"], got["d0"], got["left_out"], *got["first_hour"]["distance"]],
+                [want["d"], want["d0"], want["left_out"], *want["first_hour"]],
+                rtol=1e-9,
+            ):
+                raise SystemExit(f"{campaign}, {policy}: H1 differs from the registered result")
+            out[campaign][policy] = got
+    return out
+
+
 ANALYSES = {
     "units": resampling_units,
     "features": unmatched_features,
     "propensities": propensity_identity,
     "blocks": block_lengths,
+    "lengths": other_intervals,
+    "distances": prior_distances,
 }
 
 
