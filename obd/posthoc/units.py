@@ -42,11 +42,16 @@ def resampled(units, rng, n_replicates):
     are multinomial. Returns [replicate, column].
     """
     kinds, counts = np.unique(units, axis=0, return_counts=True)
+    return resampled_kinds(kinds, counts, rng, n_replicates)
+
+
+def resampled_kinds(kinds, counts, rng, n_replicates):
+    """`resampled` for units given as distinct rows `kinds[kind, column]` and their counts."""
+    n = counts.sum()
     batch = max(1, 20_000_000 // len(kinds))
     return np.concatenate(
         [
-            rng.multinomial(len(units), counts / len(units), min(batch, n_replicates - done))
-            @ kinds
+            rng.multinomial(n, counts / n, min(batch, n_replicates - done)) @ kinds
             for done in range(0, n_replicates, batch)
         ]
     )
