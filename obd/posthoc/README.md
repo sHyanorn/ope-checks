@@ -210,6 +210,48 @@ Standard deviation of the replicates, and in brackets over the one at ten minute
 - Not fixed beforehand: a standard deviation estimated from `n` blocks has a sampling error of its own, roughly `1 / sqrt(2 (n - 1))` of its value under a normal approximation: 3.2% at 504 blocks, 3.9% at 336, 5.5% at 168 and 9.5% at 56. The estimates at different lengths come from the same rows, so these errors are not independent, and no interval is given for a ratio between lengths. On All the ratios from 5 to 60 minutes run from 0.95 to 1.07, on Women's from 0.95 to 1.12.
 - The registered intervals and labels stand as registered.
 
+## 5. The other registered intervals and the block length
+
+The quantities, the random stream and the reading below were committed before this analysis was run; the commit that added them holds no result of it.
+
+Section 4 varies the block length for the two ratios of H3 only. Two registered labels rest on intervals that end close to the value the rule compares them with: the pooled alignment label of H4, "raises the estimate", with a lower end of `d` at 0.002, and the SNIPS label of H6, "consistent", with half-widths of 0.097 (All) and 0.098 (Women's) against the bound of 0.10. Here the intervals behind the labels of H4, H5 and H6 are computed with the block lengths of Section 4.
+
+- Quantities, as the registration defines them: `rho` and `d` of H4 at the width used (three hours on every campaign); the difference (iii) minus (ii) of H5; the IPS and SNIPS ratios of H6. `rho` and `d` are given for every campaign and for the pooled unit, `0.54 x (All) + 0.46 x (Women's)` within each replicate; H5 and H6 have no pooled unit.
+- Blocks, replicates and multiplicities are those of Section 4, so a replicate at a given length draws the same blocks here as there. `pi0` and the width of H4 stay as fixed on the full data; counts, coverage, fallback, windows and the on-policy value are recomputed in every replicate. Intervals are 2.5th and 97.5th percentiles of the replicates in which a quantity is defined.
+- The run stops if an interval at ten minutes differs from the registered one, or if the interval of the IPS ratio of H3, which enters `d`, differs at any length from the one in `results/blocks.json`.
+- Reported for each unit, quantity and length: the interval, the standard deviation of the replicates and that standard deviation over the one at ten minutes; for H6 also the half-width of the interval.
+
+How it is read:
+
+- It is descriptive. The registered rules are defined for ten-minute blocks; at another length the report says where the interval lies and gives no label. The registered labels stand.
+- Stated for each unit: the lengths at which the interval of `d` lies above 0, at which that of `rho` contains 1, at which that of the H5 difference lies above 0, and at which that of an H6 ratio contains 1 and has a half-width of at most 0.10.
+- An end of a percentile interval of 10,000 replicates carries a Monte Carlo standard error of about 0.027 times the standard deviation of the replicates, and a half-width about 0.019 times (normal approximation). An end less than two such errors from the value it is compared with, or a half-width less than two of its errors from 0.10, is reported as at that value and counted on neither side.
+- The standard deviations are read as in Section 4: lengths whose standard deviations differ by under 2% are not told apart, a rise with the length points to dependence between rows or to change over the week beyond ten minutes, and the two are not separated. At 180 minutes an interval rests on 56 resampling units.
+- Twelve intervals per length are compared with a value on the confirmatory units, five on each campaign and two on the pooled unit, at five lengths besides the registered one, without any allowance for their number.
+
+## 6. Three distances that read no click
+
+The quantities and the reading below were committed before this analysis was run; the commit that added them holds no result of it.
+
+H1 finds the published prior "inconsistent" with the hourly frequencies of the BTS log: `D` is 0.526 (All) and 0.527 (Women's) against a noise floor `D0` of 0.136 and 0.115. The label does not say whether the log shows one fixed distribution that is not the prior's, or a distribution that changed during the week. Three further distances are computed from the item, position and timestamp columns of the BTS log and from `pi0`. TV, `f_h`, `N_B` and the weights are those of H1; `f(a|k) = N_B(a,k)/N_B(k)` are the frequencies of the whole week.
+
+- `A`, the prior against the whole week: `sum over k of [N_B(k)/N_B] x TV(f(.|k), pi0(.|k))`. Its reference, since a distance is positive by construction: the same sum between the whole-week frequencies of the rows in the first, third and fifth ten-minute block of every hour and those of the other rows.
+- `E`, the hours against the whole week: `sum over (h, k) of [N_B(h,k)/N_B] x TV(f_h(.|k), f(.|k))`, over the `(h, k)` that enter `D`.
+- The first hour of the week, by position: the registered distance `TV(f_0(.|k), pi0(.|k))` and its own floor, the distance between the frequencies of the rows of that hour in its first, third and fifth block and in its other blocks, with the number of rows.
+- `D` and `D0` are recomputed, and the run stops if they differ from the registered values.
+- The same quantities for the random log with the uniform distribution in place of `pi0`: a case in which the policy is fixed and known.
+
+Two relations hold by construction when no `(h, k)` is left out. `A <= D`, because the whole-week frequencies are the row-weighted mean of the hourly ones and TV is convex. `D <= A + E`, by the triangle inequality.
+
+How it is read:
+
+- It is descriptive and gives no verdict. No interval is computed, as for `D` and `D0` in the registration. The registered label of H1 stands.
+- The noise reference is `D0`. If the policy is fixed within an hour and the two halves of the hour are independent, the expected distance between an hour's frequencies and the distribution of its policy is at most the expected distance between the halves, and about half of it when counts are large. In the registered results the random log, whose policy is fixed and uniform, has a `D` of 0.53 to 0.55 times its `D0`.
+- If the BTS log showed one fixed distribution all week, `E` would hold noise only, and `D - A` would be at most that noise. `E` and `D - A` are therefore set against the two thresholds of the registered rule of H1: at most `D0`, "not distinguishable from variation within the hour"; above `2 x D0` and above 0.10, more than the rule asks for a difference; otherwise between the two, and nothing is said.
+- What is stated from the numbers: `A` with its reference; on which side of the two thresholds `E` falls, which says whether the distribution shown changed between hours; on which side `D - A` falls, which says whether that change adds to the distance from the prior beyond what the whole week's distribution already holds; and for each position of the first hour, on which side of its floor and of twice its floor the distance falls. The first hour is one hour and its floor one split.
+- TV distances do not add. `A` and `E` bound `D` from both sides; they do not divide it into a part due to a fixed difference and a part due to change. If `E` lies above the upper threshold and `D - A` does not, that is what is reported, and the question how much of `D` is change stays open.
+- The distances describe what the log shows. A distribution that changes between hours can come from updated parameters or from servers that hold different versions of them (Section 8 of the registration), and change within an hour is part of `D0`, not of `E`.
+
 ## Code
 
 | File | Content |
