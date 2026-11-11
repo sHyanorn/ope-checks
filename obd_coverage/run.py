@@ -360,6 +360,7 @@ def main():
     parser.add_argument("--data-dir", type=Path, default=data.DEFAULT_DIR)
     parser.add_argument("--work-dir", type=Path, default=WORK_DIR)
     parser.add_argument("--data-sets", type=int, default=N_DATA_SETS)
+    parser.add_argument("--scenarios", nargs="+", choices=SCENARIOS, default=SCENARIOS)
     args = parser.parse_args()
     provenance = {
         "code_commit": _code_commit(),
@@ -382,7 +383,7 @@ def main():
     if args.step == "simulate":
         for campaign in args.campaigns or data.CAMPAIGNS:
             logs, _ = rows(args.data_dir, campaign)
-            for scenario in SCENARIOS:
+            for scenario in args.scenarios:
                 path = args.work_dir / f"{campaign}_{scenario}.npz"
                 simulate(logs, calibration[campaign], campaign, scenario, path, args.data_sets)
         return None
