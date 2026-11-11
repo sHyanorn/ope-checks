@@ -379,20 +379,22 @@ def data_sets(campaign, name):
 
 
 def over(sums):
-    """D3 over the data sets, by block length: G, and V and W over those at ten minutes."""
+    """D3 over the data sets, by block length, for the ratio and within each log: G, and V and
+    W over those at ten minutes."""
     ten = blocks.MINUTES.index(10)
     x = {key: sums[..., i] for i, key in enumerate(direct.SUMS)}  # [data set, length]
+    of = ("", *(f"_{log}" for log in LOGS))
     out = {}
     for j, minutes in enumerate(blocks.MINUTES):
-        out[str(minutes)] = {
-            "g": reading.spread(1 - x["w"][:, j] / x["v"][:, j]),
-            "v_over_ten": reading.spread(x["v"][:, j] / x["v"][:, ten]),
-            "w_over_ten": reading.spread(x["w"][:, j] / x["w"][:, ten]),
-            "between": reading.spread(x["between"][:, j]),
-        } | {
-            f"g_{log}": reading.spread(1 - x[f"w_{log}"][:, j] / x[f"v_{log}"][:, j])
-            for log in LOGS
-        }
+        out[str(minutes)] = (
+            {"between": reading.spread(x["between"][:, j])}
+            | {f"g{s}": reading.spread(1 - x[f"w{s}"][:, j] / x[f"v{s}"][:, j]) for s in of}
+            | {
+                f"{key}{s}_over_ten": reading.spread(x[key + s][:, j] / x[key + s][:, ten])
+                for s in of
+                for key in "vw"
+            }
+        )
     return out
 
 

@@ -173,6 +173,20 @@ def test_the_real_share_is_read_against_the_two_ranges():
     assert out["label"] == "more like dependence"
 
 
+def test_the_residuals_are_summarised_for_the_ratio_and_within_each_log():
+    long = blocks.MINUTES.index(180)
+    sums = np.ones((3, *extension.RESIDUALS))  # [data set, length, sum]
+    for key, values in (("v", [2, 4, 6]), ("v_random", [4, 4, 4]), ("w_bts", [1, 2, 3])):
+        sums[:, long, direct.SUMS.index(key)] = values
+    out = extension.over(sums)
+    assert out["180"]["g"]["median"] == 0.75 and out["10"]["g"]["median"] == 0
+    assert out["180"]["v_over_ten"]["median"] == 4 and out["180"]["w_over_ten"]["median"] == 1
+    assert out["180"]["g_random"]["median"] == 0.75 and out["180"]["g_bts"]["median"] == -1
+    assert out["180"]["v_random_over_ten"]["median"] == 4
+    assert out["180"]["w_bts_over_ten"]["median"] == 2
+    assert out["180"]["w_random_over_ten"]["median"] == out["180"]["v_bts_over_ten"]["median"] == 1
+
+
 REGISTERED = json.loads((run.RESULTS / "coverage.json").read_text())["reading"]
 
 
