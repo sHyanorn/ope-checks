@@ -1,6 +1,6 @@
 """Run the post hoc analyses.
 
-    python -m obd.posthoc.run                    all six
+    python -m obd.posthoc.run                    all seven
     python -m obd.posthoc.run units features     some of them
 
 Results go to obd/posthoc/results/<analysis>.json. The data directory is that of `obd.run`.
@@ -16,7 +16,7 @@ import pyarrow.parquet as pq
 
 from obd import data
 from obd import estimators as est
-from obd.posthoc import blocks, distances, features, lengths, propensities, units
+from obd.posthoc import blocks, distances, features, lengths, prior, propensities, units
 from obd.run import POOL
 
 HERE = Path(__file__).parent
@@ -177,6 +177,10 @@ def prior_distances(data_dir):
     return out
 
 
+def prior_file(data_dir):
+    return prior.shared_pairs({c: data.read_prior(data_dir, c) for c in data.CAMPAIGNS})
+
+
 ANALYSES = {
     "units": resampling_units,
     "features": unmatched_features,
@@ -184,6 +188,7 @@ ANALYSES = {
     "blocks": block_lengths,
     "lengths": other_intervals,
     "distances": prior_distances,
+    "prior": prior_file,
 }
 
 
