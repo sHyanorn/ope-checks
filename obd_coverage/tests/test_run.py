@@ -72,6 +72,12 @@ def test_settings_of_a_scenario(calibrated):
     assert q == pytest.approx(np.array(calibration["rate"])[logs[0].cell])
     (drifted, _, _), _ = run.settings(logs, calibration, "D", "all")
     assert not np.allclose(drifted, q)
+    (_, groups, excess), _ = run.settings(logs, calibration, "I", "all")
+    assert groups is None and excess == (calibration["e_impression"], 0, 0)
+    (_, groups, excess), (_, _, bts_excess) = run.settings(logs, calibration, "M", "all")
+    assert groups.long is None and excess[2] == bts_excess[2] == 0
+    assert excess[1] == calibration["session"]["random"]["e"]
+    assert bts_excess[1] == calibration["session"]["bts"]["e"]
     (_, groups, excess), (_, _, bts_excess) = run.settings(logs, calibration, "U", "all")
     assert groups.long is not None
     assert excess[0] == bts_excess[0] == calibration["e_impression"]
@@ -106,14 +112,15 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
     assert summary["variance_ratio"]["bts"]["10"]["published"] == 1.1
 
 
-def results(label_of, widening):
+def results(label_of, widening, at_60=None):
     """Results in which the label of a primary cell is `label_of(scenario, unit)`."""
     cells = {
         s: {
             "cells": {"ips_ratio": {str(u): {"label": label_of(s, u)} for u in UNITS}},
             "sd_of_ips_ratio": {
                 "over_ten_minutes": {
-                    str(m): {"published": widening, "p97.5": 1.2} for m in (60, 180)
+                    str(m): {"published": at_60 if at_60 and m == 60 else widening, "p97.5": 1.2}
+                    for m in (60, 180)
                 }
             },
         }
@@ -151,3 +158,12 @@ def test_the_confirmatory_reading_when_everything_counts_against_ten_minutes():
         "H": {"10": "adequate", "180": "adequate"},
         "U": {"10": "under-covers", "180": "under-covers"},
     }
+
+
+def test_one_look_above_the_percentile_flags_a_campaign():
+    reading = run.confirmatory(results(lambda s, u: "adequate", 1.3, at_60=1.1))
+    assert reading["by_campaign"]["women"]["5_published_widening_above_M"] == {
+        "60": False,
+        "180": True,
+    }
+    assert reading["against_ten_minute_intervals"]["widening_above_M"] == ["all", "women"]

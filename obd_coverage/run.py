@@ -168,7 +168,7 @@ def calibrate(logs, clicks, target, campaign):
             "solved": e_l,
         }
 
-    if (1 + e_i) * rate.max() > 1:
+    if not (1 + e_i) * rate.max() <= 1:
         raise SystemExit(f"{campaign}: (1 + e_I) max q = {(1 + e_i) * rate.max():.3f} exceeds 1")
     out["truth"], out["predicted"] = {}, {}
     for scenario in SCENARIOS:

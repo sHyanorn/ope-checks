@@ -12,9 +12,9 @@ The registration was written with the results of `obd` known. Its calibration us
 
 Scenarios: A independent clicks; I dependence within an impression; M impressions and synthetic sessions of one or two minutes, at the strength solved from the published statistics; D independent clicks with a click rate that moves over the week in both logs alike; H as M with groups of sessions spanning 60 minutes; U as M with groups spanning 24 hours. Every row has the same marginal click probability in every scenario without drift.
 
-Units: rows; impressions; clock blocks of 5 to 180 minutes with the multiplicities of `obd`. Each cell rests on 4,000 data sets and intervals of 2,000 replicates. A coverage near 0.95 has a Monte Carlo standard error of 0.003, one near 0.85 of 0.006.
+Units: rows; impressions; clock blocks of 5 to 180 minutes with the multiplicities of `obd`. Each cell rests on 4,000 data sets and intervals of 2,000 replicates. A coverage near 0.95 has a Monte Carlo standard error of 0.003, one near 0.85 of 0.006. Coverages are printed to three decimals, one more than that error carries; the third is uncertain.
 
-Labels, from the Wilson 95% interval of a coverage: adequate if it lies within 0.925 to 0.975, under-covers (-) if below 0.925, over-covers (+) if above 0.975, unresolved (?) otherwise.
+Labels, from the Wilson 95% interval of a coverage: adequate if it lies within 0.925 to 0.975, under-covers (-) if below 0.925, over-covers (+) if above 0.975, unresolved (?) otherwise. A cell can be adequate while its interval excludes 0.95: 83 of the 576 cells are. `results/cells.md` says for every cell whether the interval contains 0.95.
 
 ## Calibration
 
@@ -24,7 +24,11 @@ Labels, from the Wilson 95% interval of a coverage: adequate if it lies within 0
 | Women's | 24.7 | 2 | 24.7 (solved 25.6) | 2 | 24.7 (solved 28.2) | 24.7 (solved 29.6) | 24.7 (solved 172.8) | 1.0017 |
 | Men's | 16.2 | 2 | 16.2 (solved 31.0) | 2 | 16.2 (solved 19.4) | 0.5 | 3.5 | 0.9215 |
 
-`e` is the excess probability that two rows are both clicked: within an impression (`e_I`), within a session (`e_S`), within a long group (`e_L`). `T` is the session span in minutes. A strength that would have exceeded the next narrower one was cut back to it, as registered; the table gives the solved value in brackets and `calibration.json` lists every case under `notes`. Where a strength was cut back the scenario is weaker than the published number it was solved from: M on Women's and Men's, H on Women's, U on All and Women's.
+`e` is the excess probability that two rows are both clicked: within an impression (`e_I`), within a session (`e_S`), within a long group (`e_L`). `T` is the session span in minutes. A strength that would have exceeded the next narrower one was cut back to it, as registered; the table gives the solved value in brackets and `calibration.json` lists every case under `notes`. Where a strength was cut back the scenario is weaker than the published number it was solved from: M on Women's and Men's, H on Women's, U on All and Women's. A campaign has one `e_L` and two `e_S`; `e_L` was cut back to the smaller of the two.
+
+M gives all of the published variance ratio to dependence. The ratio does not separate dependence from a click rate that moves between blocks, so M is an upper reading of short-range dependence (Section 5 of the registration).
+
+Three departures from the wording of Section 5. The calibration file does not hold the numbers of labels and sub-labels; they follow from the span and the number of impressions (`model.groupings`): 8 and 135 labels on All (random, BTS), 10 and 90 on Women's, 5 and 46 on Men's, which puts 5.3 to 5.9 impressions in a label's window. The expected variance of a bootstrap over rows or impressions includes the squared expected contribution of each unit, which the registered wording leaves out; without it `e_I` on Men's would be 16.0 instead of 16.2. The variance ratios at 60 minutes below rest on 200 data sets and have a Monte Carlo standard error of 0.01 to 0.04, those at ten minutes of at most 0.011.
 
 What the simulated data sets show of the statistics they were solved from (mean over data sets; variance ratios at 1, 10 and 60 minutes on the first 200):
 
@@ -46,7 +50,7 @@ What the simulated data sets show of the statistics they were solved from (mean 
 | Men's | U | 1.18 | 1.75 | 1.87 | 1.17 | 1.90 | 2.02 | 1.025 | 1.30 |
 | Men's | published | 1.18 | 2.45 | 2.07 | 1.20 | 2.08 | 2.02 | 1.025 | 1.47 |
 
-M reproduces the published ratio of impressions to rows on every campaign and the variance ratios at one and ten minutes on All. On Women's its ten-minute ratios are 1.87 and 2.07 against 1.92 and 2.23, on Men's 1.76 and 1.90 against 2.45 and 2.08. With ten-minute blocks over rows it gives 1.32, 1.35 and 1.30 against the published 1.37, 1.45 and 1.47.
+M reproduces the published ratio of impressions to rows on every campaign and the ten-minute variance ratios on All; at one minute the random log of All gives 1.34 against 1.29. On Women's its ten-minute ratios are 1.87 and 2.07 against 1.92 and 2.23, on Men's 1.76 and 1.90 against 2.45 and 2.08. With ten-minute blocks over rows it gives 1.32, 1.35 and 1.30 against the published 1.37, 1.45 and 1.47.
 
 ## Results: the IPS ratio
 
@@ -91,8 +95,8 @@ The primary cells are the IPS ratio on All and on Women's. Coverage is followed 
 
 1. Check of the implementation. In A, rows are adequate on both: 0.951 (0.944 to 0.957) and 0.951 (0.944 to 0.958).
 2. M. Rows under-cover: 0.866 (0.855 to 0.876) on All and 0.846 (0.834 to 0.856) on Women's. Impressions under-cover: 0.880 (0.870 to 0.890) and 0.860 (0.849 to 0.870). Ten-minute blocks are adequate: 0.951 (0.943 to 0.957) on both.
-3. Shortest adequate block. In A, I, M and D it is 5 minutes on both campaigns, and every longer length is adequate. In H it is 180 minutes on All, and no length is adequate on Women's. In U no length is adequate on either.
-4. H and U. In H ten-minute blocks under-cover, 0.907 (0.898 to 0.916) on All and 0.850 (0.838 to 0.860) on Women's; 180-minute blocks are adequate on All, 0.935 (0.927 to 0.942), and unresolved on Women's, 0.931 (0.922 to 0.938). In U ten-minute blocks under-cover, 0.883 (0.873 to 0.893) and 0.830 (0.818 to 0.841), and so do 180-minute blocks, 0.889 (0.879 to 0.899) and 0.854 (0.842 to 0.864).
+3. Shortest adequate block. In A, I, M and D it is 5 minutes on both campaigns, and every longer length is adequate. In H it is 180 minutes on All, and no length is adequate on Women's. In U no length is adequate on either. The label on All in H at 180 minutes is a narrow one: see item 4.
+4. H and U. In H ten-minute blocks under-cover, 0.907 (0.898 to 0.916) on All and 0.850 (0.838 to 0.860) on Women's; 180-minute blocks are adequate on All, 0.935 (0.927 to 0.942), with an interval that excludes 0.95 and ends 0.002 above the bound, and unresolved on Women's, 0.931 (0.922 to 0.938). In U ten-minute blocks under-cover, 0.883 (0.873 to 0.893) and 0.830 (0.818 to 0.841), and so do 180-minute blocks, 0.889 (0.879 to 0.899) and 0.854 (0.842 to 0.864).
 5. The published widening against M. This item is post hoc and descriptive with respect to `obd`; it uses published numbers only and changes no registered label. Standard deviation of the replicates of the IPS ratio over the one at ten minutes, median and 2.5th to 97.5th percentile over the data sets:
 
 | Campaign | Scenario | 60 min: simulated | published | 180 min: simulated | published |
@@ -112,17 +116,19 @@ On All the published ratios, 1.069 at 60 minutes and 1.134 at 180, lie below the
 What the registration counts against the ten-minute intervals of `obd`:
 
 - Ten-minute blocks under-cover in M: not found on either campaign.
-- A campaign flagged in item 5: Women's. The widening of its intervals up to 180 minutes is more than short-range dependence of the solved strength produces, and its registered ten-minute intervals are not shown to cover. If the widening is dependence that reaches an hour, as in H, ten-minute intervals there cover 0.850 and 180-minute intervals 0.931. H was cut back on Women's; its ratio at 180 minutes spans 1.033 to 1.605 over the data sets, which contains the published 1.365, and at 60 minutes 1.081 to 1.385, which contains 1.123.
-- No block length adequate in U: found on both campaigns. The published statistics therefore do not exclude a structure in which no interval of this study covers. U was cut back on both: its ratio at 180 minutes spans 0.820 to 1.259 on All, which contains the published 1.134, and 0.842 to 1.297 on Women's, which does not reach 1.365.
+- A campaign flagged in item 5: Women's. The widening of its intervals up to 180 minutes is more than the short-range dependence of M produces, and its registered ten-minute intervals are not shown to cover. If the widening is dependence, the ten-minute labels of H and U say what follows: coverage of 0.850 in H and 0.830 in U.
+- No block length adequate in U: found on both campaigns. By the registration the published statistics then do not exclude a structure in which no interval of this study covers.
 
 What the registration counts for them, ten-minute blocks adequate in M on both campaigns and no campaign flagged, holds in its first half only.
 
 H and U were tuned so that the true variance exceeds what ten-minute blocks see. That ten-minute blocks under-cover there was expected and is no finding by itself.
 
+Not part of the registered reading: how well H and U fit the published numbers they were not solved from. On Women's, H was cut back; its ratio of standard deviations at 180 minutes spans 1.033 to 1.605 over the data sets, which contains the published 1.365, but at 60 minutes its median is 1.225 against the published 1.123, and its variance ratios at 60 minutes are 3.35 and 3.94 against the published 2.07 and 3.33. H therefore overstates the dependence within the hour on Women's. U was cut back on All and Women's; its ratio at 180 minutes spans 0.820 to 1.259 on All, which contains the published 1.134, and 0.842 to 1.297 on Women's, which does not reach 1.365. On All the published variance ratio of the BTS log at 60 minutes, 2.61, is above the 1.95 of M and close to the 2.74 of H. None of the scenarios reproduces every published statistic of a campaign.
+
 ## What this says about the `obd` intervals
 
-- With rows or impressions as resampling units, as in the public computations that `obd` cites, a nominal 95% interval of the IPS ratio covers 0.85 to 0.88 in M: the standard deviation of the replicates is 0.74 to 0.80 of that of the estimate.
-- On All nothing above speaks against ten-minute blocks except the statement on U, which no data of the week can exclude.
+- With rows or impressions as resampling units, as in the public computations that `obd` cites, a nominal 95% interval of the IPS ratio covers 0.85 to 0.88 in M: the standard deviation of the replicates is 0.74 to 0.80 of that of the estimate. M is an upper reading of short-range dependence; if part of the published variance ratio is a moving click rate, rows and impressions cover more than this.
+- On All no registered criterion against ten-minute blocks is met other than the statement on U.
 - On Women's the ten-minute intervals are not shown to cover. Every H3 label of `obd` is "no shortfall shown" and rests on an interval that contains 1; the post hoc intervals at 180 minutes contain 1 as well. The labels of `obd` that rest on an interval excluding a value or on a width (the pooled `d`, H5, the SNIPS half-width of H6) and the pooled unit were not simulated here.
 - No registered file, result or label of `obd` changes.
 
@@ -152,11 +158,11 @@ The calibration file predicted every coverage from second moments and a normal a
 
 | Quantity | Cells | Prediction outside the Wilson interval | Mean of simulated minus predicted | Smallest | Largest | Cells more than 0.01 apart |
 |---|---|---|---|---|---|---|
-| ips_ratio | 144 | 33 | -0.0039 | -0.026 | +0.010 | 18 |
-| snips_ratio | 144 | 34 | -0.0039 | -0.029 | +0.010 | 17 |
-| ips | 144 | 38 | -0.0042 | -0.027 | +0.008 | 25 |
-| v_on | 144 | 42 | -0.0024 | -0.018 | +0.016 | 28 |
-| all | 576 | 147 | -0.0036 | -0.029 | +0.016 | 88 |
+| ips_ratio | 144 | 33 | -0.004 | -0.026 | +0.010 | 18 |
+| snips_ratio | 144 | 34 | -0.004 | -0.029 | +0.010 | 17 |
+| ips | 144 | 38 | -0.004 | -0.027 | +0.008 | 25 |
+| v_on | 144 | 42 | -0.002 | -0.018 | +0.016 | 28 |
+| all | 576 | 147 | -0.004 | -0.029 | +0.016 | 88 |
 
 The prediction lies outside the Wilson interval of the simulated coverage in 147 of 576 cells; the simulated coverage is lower by 0.004 on average and by up to 0.029 (SNIPS ratio, Women's, U, 180 minutes). In the primary cells of items 1, 2 and 4 the prediction and the simulated coverage lie on the same side of 0.925. The widest gap among them is on Women's in U at 180 minutes, predicted 0.879 and simulated 0.854; in H at 180 minutes on Women's the prediction is 0.943 and the simulated coverage 0.931, which is unresolved.
 
@@ -166,7 +172,7 @@ Section 10 of the registration. In short: it does not show that the real depende
 
 ## Earlier work
 
-A search found no study that counts the coverage of intervals for off-policy estimates on this dataset, compares resampling units on it against a known value, or generates clicks on its kept lists. The intervals of the Open Bandit Pipeline resample rows (`obp/utils.py`, tag 0.5.5), and the dataset paper (arXiv 2008.07146v5) reports no coverage. The simulations of interval coverage for off-policy estimates that were read draw independent rounds. A search that finds nothing does not show that nothing exists: of Korovaitceva et al. (Web Conference 2026), which analyses this dataset, only the abstract could be read. Not obtained in full, and so not used: Lahiri (1999), Politis and Romano (1994), Hall, Horowitz and Jing (1995), Burton et al. (2006), Bradley (1978). The sources the design borrows from are in Section 13 of the registration.
+A search found no study that counts the coverage of intervals for off-policy estimates on this dataset, compares resampling units on it against a known value, or generates clicks on its kept lists. It covered arXiv, the papers that Semantic Scholar lists as citing the dataset paper, OpenAlex and Crossref, and the issue list of the pipeline's repository, with the name of the dataset combined with coverage, bootstrap, resampling unit, block or cluster bootstrap, A/A test, semi-synthetic and i.i.d., and off-policy evaluation combined with clustered, dependent or non-stationary data. The intervals of the Open Bandit Pipeline resample rows (`obp/utils.py`, tag 0.5.5), and the dataset paper (arXiv 2008.07146v5) reports no coverage. The simulations of interval coverage for off-policy estimates that were read draw independent rounds. A search that finds nothing does not show that nothing exists: of Korovaitceva et al. (Web Conference 2026), which analyses this dataset, only the abstract could be read. Not obtained in full, and so not used: Lahiri (1999), Politis and Romano (1994), Hall, Horowitz and Jing (1995), Burton et al. (2006), Bradley (1978). The sources the design borrows from are in Section 13 of the registration.
 
 ## Reproduce
 
