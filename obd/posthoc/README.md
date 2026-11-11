@@ -6,7 +6,7 @@ Everything in this directory was fixed after the confirmatory results were known
 python -m obd.posthoc.run
 ```
 
-writes `results/units.json`, `results/features.json` and `results/propensities.json`. The numbers below come from one run of commit `41969f3` (numpy 2.5.4). Intervals are 2.5th and 97.5th percentiles of 10,000 replicates. Wherever ten-minute blocks are resampled, the multiplicities are the registered ones.
+writes `results/units.json`, `results/features.json`, `results/propensities.json` and `results/blocks.json`. The numbers of Sections 1 to 3 come from one run of commit `41969f3` (numpy 2.5.4); Section 4 names its own run. Intervals are 2.5th and 97.5th percentiles of 10,000 replicates. Wherever ten-minute blocks are resampled, the multiplicities are the registered ones.
 
 ## 1. Interval width and the resampling unit
 
@@ -173,6 +173,42 @@ How it is read:
 - Two things are stated from the table for each unit: the lengths at which the interval contains 1, and the range of the standard deviation over the one at ten minutes.
 - The standard deviation of 10,000 replicates carries a Monte Carlo error of about 0.7% of its value (normal approximation), and the ratio of two of them about 1%. Lengths whose standard deviations differ by under 2% are not told apart.
 - A standard deviation that grows with the length would point to dependence between rows, or to change over the week, that reaches beyond ten minutes. This analysis does not separate the two (Section 8 of the registration). At 180 minutes an interval rests on 56 resampling units.
+
+The numbers below come from one run of commit `7ec1253` (numpy 2.5.3), `python -m obd.posthoc.run blocks`, stored in `results/blocks.json`. The intervals at ten minutes are the registered ones.
+
+| Unit | Ratio | Estimate | 5 min | 10 min | 20 min | 30 min | 60 min | 180 min |
+|---|---|---|---|---|---|---|---|---|
+| Men's | IPS | 0.891 | 0.790 to 1.001 | 0.790 to 1.005 | 0.790 to 1.001 | 0.789 to 1.000 | 0.788 to 1.004 | 0.781 to 1.004 |
+| Men's | SNIPS | 0.908 | 0.806 to 1.019 | 0.805 to 1.022 | 0.807 to 1.019 | 0.805 to 1.018 | 0.804 to 1.022 | 0.799 to 1.020 |
+| All | IPS | 0.948 | 0.870 to 1.028 | 0.867 to 1.033 | 0.866 to 1.033 | 0.863 to 1.037 | 0.863 to 1.040 | 0.856 to 1.044 |
+| All | SNIPS | 0.948 | 0.871 to 1.028 | 0.867 to 1.032 | 0.866 to 1.034 | 0.864 to 1.035 | 0.864 to 1.039 | 0.856 to 1.045 |
+| Women's | IPS | 1.004 | 0.919 to 1.095 | 0.917 to 1.099 | 0.910 to 1.104 | 0.908 to 1.108 | 0.906 to 1.112 | 0.890 to 1.144 |
+| Women's | SNIPS | 1.004 | 0.920 to 1.094 | 0.917 to 1.099 | 0.910 to 1.102 | 0.908 to 1.106 | 0.906 to 1.111 | 0.890 to 1.140 |
+| Pooled | IPS | 0.974 | 0.916 to 1.035 | 0.915 to 1.036 | 0.911 to 1.039 | 0.907 to 1.042 | 0.909 to 1.042 | 0.897 to 1.056 |
+| Pooled | SNIPS | 0.974 | 0.916 to 1.035 | 0.914 to 1.036 | 0.912 to 1.039 | 0.908 to 1.042 | 0.909 to 1.041 | 0.896 to 1.057 |
+
+Standard deviation of the replicates, and in brackets over the one at ten minutes:
+
+| Unit | Ratio | 5 min | 10 min | 20 min | 30 min | 60 min | 180 min |
+|---|---|---|---|---|---|---|---|
+| Men's | IPS | 0.0540 (0.98) | 0.0550 (1.00) | 0.0538 (0.98) | 0.0538 (0.98) | 0.0554 (1.01) | 0.0567 (1.03) |
+| Men's | SNIPS | 0.0546 (0.98) | 0.0556 (1.00) | 0.0544 (0.98) | 0.0548 (0.98) | 0.0560 (1.01) | 0.0563 (1.01) |
+| All | IPS | 0.0405 (0.95) | 0.0424 (1.00) | 0.0433 (1.02) | 0.0447 (1.05) | 0.0454 (1.07) | 0.0481 (1.13) |
+| All | SNIPS | 0.0401 (0.95) | 0.0421 (1.00) | 0.0432 (1.03) | 0.0441 (1.05) | 0.0449 (1.07) | 0.0479 (1.14) |
+| Women's | IPS | 0.0447 (0.96) | 0.0467 (1.00) | 0.0491 (1.05) | 0.0511 (1.09) | 0.0524 (1.12) | 0.0637 (1.36) |
+| Women's | SNIPS | 0.0445 (0.95) | 0.0466 (1.00) | 0.0489 (1.05) | 0.0510 (1.09) | 0.0520 (1.12) | 0.0630 (1.35) |
+| Pooled | IPS | 0.0300 (0.97) | 0.0310 (1.00) | 0.0323 (1.04) | 0.0338 (1.09) | 0.0343 (1.10) | 0.0406 (1.31) |
+| Pooled | SNIPS | 0.0298 (0.96) | 0.0310 (1.00) | 0.0324 (1.05) | 0.0335 (1.08) | 0.0342 (1.11) | 0.0408 (1.32) |
+
+- On All, Women's and the pooled unit the interval of each ratio contains 1 at every length.
+- On Men's the SNIPS interval contains 1 at every length. The IPS interval contains 1 at every length but 30 minutes, where its upper end is 0.9997; across the six lengths that upper end lies between 0.9997 and 1.0046.
+- The standard deviation over the one at ten minutes ranges from 0.98 to 1.03 (IPS) and 0.98 to 1.01 (SNIPS) on Men's, 0.95 to 1.13 and 0.95 to 1.14 on All, 0.96 to 1.36 and 0.95 to 1.35 on Women's, and 0.97 to 1.31 and 0.96 to 1.32 on the pooled unit.
+- On Men's no length is more than 3% from ten minutes. For 5 to 60 minutes the standard deviation of the IPS ratio is 0.054 to 0.055; Section 3 of the registration gives 0.052 to 0.054.
+- On All, Women's and the pooled unit the standard deviation is smaller at 5 minutes than at ten and larger at every longer length: 0.95 to 0.97 of the one at ten minutes at 5 minutes, 1.07 to 1.12 at 60 minutes and 1.13 to 1.36 at 180 minutes. Each of these differs from ten minutes by more than the 2% fixed above; the smallest difference is 2.1% (All, IPS, 20 minutes). Between neighbouring lengths the step from 30 to 60 minutes is under 2% on All (IPS, 1.44%), All (SNIPS, 1.95%), the pooled unit (IPS, 1.34%), and by that rule those two lengths are not told apart there.
+- The registration measured on Men's a width that does not depend on the block length. That is reproduced on Men's. It is not what the estimates on the confirmatory campaigns show, and whether their rise exceeds sampling error is not tested here.
+- As fixed above, a rise points to dependence between rows, or to change over the week, that reaches beyond ten minutes, and the two are not separated. With longer blocks the intervals of the confirmatory units are wider than at ten minutes and still contain 1: the pooled IPS interval is 0.915 to 1.036 at ten minutes, 0.909 to 1.042 at 60 minutes and 0.897 to 1.056 at 180 minutes.
+- Not fixed beforehand: a standard deviation estimated from `n` blocks has a sampling error of its own, roughly `1 / sqrt(2 (n - 1))` of its value under a normal approximation: 3.2% at 504 blocks, 3.9% at 336, 5.5% at 168 and 9.5% at 56. The estimates at different lengths come from the same rows, so these errors are not independent, and no interval is given for a ratio between lengths. On All the ratios from 5 to 60 minutes run from 0.95 to 1.07, on Women's from 0.95 to 1.12.
+- The registered intervals and labels stand as registered.
 
 ## Code
 
