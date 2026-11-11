@@ -373,6 +373,15 @@ The first hour of the week:
 - The first hour is closer to the prior than the frequencies of the whole week are (`A`). At five of the nine positions its distance is at most its floor, the threshold under which the registered rule says "not distinguishable from variation within the hour"; at the other four it lies between the two thresholds. This is not a finding that the prior was in force in that hour: it is one hour with one split, and its floor contains whatever change the policy made within the hour.
 - The registered label of H1 stands. What these distances add: "inconsistent" covers a whole-week distribution that is not the prior's and a distribution that changed from hour to hour, and the size of each part of `D` is not determined.
 
+## 7. Parameter pairs of the prior file
+
+This check was first made after the confirmatory results were known, and its outcome was known when this text was written. It is recorded here so that the statement has a source in this repository that can be rerun; the text was committed before the code and the result file.
+
+Section 8 of the registration says that All has as many items as Men's and Women's together (80 = 34 + 46) and that whether they are the same items cannot be told from the data. The prior file gives each campaign a list of pairs of Beta parameters, one pair per item. The check reads that file and nothing else. It counts, for each ordered pair of campaigns, how many parameter pairs of the first occur among those of the second, and it reports whether the pairs of a campaign are all distinct and whether shared pairs stand in the same order in both lists.
+
+- Equal parameter pairs do not identify items: the file holds no item identifier that is common to the campaigns. That campaigns share items is an inference from pairs that occur in both.
+- It is descriptive, gives no verdict and changes nothing in the registration.
+
 ## Code
 
 | File | Content |
