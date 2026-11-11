@@ -33,6 +33,19 @@ def test_double_clicks_and_the_pairs_expected_of_independent_rows():
     assert direct.expected_pairs(log, q) == pytest.approx(expected)
 
 
+def test_the_impression_with_most_double_clicks_and_the_excess_without_it():
+    log = log_of([0, 0, 0, 0, 1, 1, 2, 2])
+    q = np.full(8, 0.5)
+    found = direct.largest_impression(log, np.array([0, 1, 2, 4, 5]), q)
+    assert found == {
+        "rows": 4,
+        "clicks": 3,
+        "pairs": 3.0,
+        "share_of_pairs": 0.75,
+        "excess_without": pytest.approx(1 / 0.5 - 1),  # one pair where half a pair is expected
+    }
+
+
 def test_the_excess_of_double_clicks_estimates_the_excess_of_the_model():
     rng = np.random.default_rng(0)
     log = log_of(np.repeat(np.arange(200_000), 3))

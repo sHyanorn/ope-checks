@@ -4,6 +4,7 @@ python -m obd_coverage.extension check       # the registered parameters, with t
 python -m obd_coverage.extension calibrate   # results/extension/calibration.json; reads the clicks
 python -m obd_coverage.extension simulate all women --scenarios F FH
 python -m obd_coverage.extension read        # results/extension/coverage.json
+python -m obd_coverage.extension posthoc     # results/extension/posthoc.json; not registered
 """
 
 import argparse
@@ -176,24 +177,58 @@ def residual_table(sums):
     return out
 
 
+def solve_sessions(log, q, e_i, ratios, campaign, i, size, minutes):
+    """`e_S` of one log at a session size and span within user types, and the sessions."""
+    session = model.groupings(
+        log.start, minutes, None, typed_rng(campaign, i), size, kind=log.kind
+    ).session
+    solved = moments.solve(ratios[10], *moments.variance_ratio_moments(log, q, session, e_i, 10))
+    e_s = min(max(solved, 0), e_i)
+    (n0, n1), (d0, d1) = moments.variance_ratio_moments(log, q, session, e_i, 1)
+    at_one = (n0 + e_s * (n1 - n0)) / (d0 + e_s * (d1 - d0))
+    return {"e": e_s, "solved": solved, "variance_ratio_at_1": at_one}, session
+
+
 def fit_sessions(log, q, e_i, ratios, campaign, i):
     """Span, strength and size of the sessions of one log within user types (Section 3)."""
     for size in SIZES:
-        tried = {}
-        for minutes in model.SPANS:
-            session = model.groupings(
-                log.start, minutes, None, typed_rng(campaign, i), size, kind=log.kind
-            ).session
-            solved = moments.solve(
-                ratios[10], *moments.variance_ratio_moments(log, q, session, e_i, 10)
-            )
-            e_s = min(max(solved, 0), e_i)
-            (n0, n1), (d0, d1) = moments.variance_ratio_moments(log, q, session, e_i, 1)
-            at_one = (n0 + e_s * (n1 - n0)) / (d0 + e_s * (d1 - d0))
-            tried[minutes] = {"e": e_s, "solved": solved, "variance_ratio_at_1": at_one}
+        tried = {
+            minutes: solve_sessions(log, q, e_i, ratios, campaign, i, size, minutes)[0]
+            for minutes in model.SPANS
+        }
         best = min(tried, key=lambda m: abs(tried[m]["variance_ratio_at_1"] - ratios[1]))
         if tried[best]["solved"] <= e_i or size == SIZES[-1]:
             return {"minutes": best, "size": size} | tried[best]
+
+
+def session_grid(logs, base, measured, target, campaign):
+    """Every size and span that `fit_sessions` chooses among, per log, with the sessions that
+    the grouping forms. Descriptive; no part of the registration."""
+    rate, out = np.array(base["rate"]), {}
+    for i, (log, name) in enumerate(zip(logs, LOGS, strict=True)):
+        e_i = max(0.0, measured["double_clicks"][name]["excess"])
+        out[name] = {}
+        for size in SIZES:
+            out[name][f"{size:g}"] = {}
+            for minutes in model.SPANS:
+                tried, session = solve_sessions(
+                    log,
+                    rate[log.cell],
+                    e_i,
+                    target["variance_ratio"][name],
+                    campaign,
+                    i,
+                    size,
+                    minutes,
+                )
+                held = np.bincount(session)
+                held = held[held > 0]  # impressions of each session
+                out[name][f"{size:g}"][str(minutes)] = tried | {
+                    "sessions": len(held),
+                    "impressions_per_session": float(held.mean()),
+                    "seen_from_an_impression": float((held**2).sum() / held.sum()),
+                }
+    return out
 
 
 def fit_long(logs, base, scenario, campaign, target, long_minutes):
@@ -539,6 +574,7 @@ def check(data_dir, baseline, campaigns):
                 with np.load(baseline / f"women_{scenario}.npz") as before:
                     n = int(before["done"])
                     path = baseline / f"again_{scenario}.npz"
+                    path.unlink(missing_ok=True)  # `simulate` would continue from it
                     run.simulate(logs, stored[campaign], campaign, scenario, path, n)
                     with np.load(path) as after:
                         apart = max(
@@ -552,7 +588,7 @@ def check(data_dir, baseline, campaigns):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("step", choices=["check", "calibrate", "simulate", "read"])
+    parser.add_argument("step", choices=["check", "calibrate", "simulate", "read", "posthoc"])
     parser.add_argument("campaigns", nargs="*", choices=data.CAMPAIGNS)
     parser.add_argument("--data-dir", type=Path, default=data.DEFAULT_DIR)
     parser.add_argument("--work-dir", type=Path, default=WORK_DIR)
@@ -578,6 +614,21 @@ def main():
             result[campaign] = calibrate(logs, clicks, base[campaign], target[campaign], campaign)
         return run._write("extension/calibration.json", result)
     calibration = json.loads((RESULTS / "calibration.json").read_text())
+    if args.step == "posthoc":
+        result = provenance | {"calibration_commit": calibration["code_commit"]}
+        for campaign in data.CAMPAIGNS:
+            logs, clicks = run.rows(args.data_dir, campaign)
+            rate, measured = np.array(base[campaign]["rate"]), calibration[campaign]["direct"]
+            result[campaign] = {
+                "sessions": session_grid(
+                    logs, base[campaign], measured, target[campaign], campaign
+                ),
+                "largest_impression": {
+                    name: direct.largest_impression(log, np.flatnonzero(c), rate[log.cell])
+                    for log, c, name in zip(logs, clicks, LOGS, strict=True)
+                },
+            }
+        return run._write("extension/posthoc.json", result)
     args.work_dir.mkdir(parents=True, exist_ok=True)
     if args.step == "simulate":
         for campaign in args.campaigns or data.CAMPAIGNS:

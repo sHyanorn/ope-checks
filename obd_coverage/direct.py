@@ -31,6 +31,20 @@ def double_clicks(log, clicked):
     return k * (k - 1) / 2
 
 
+def largest_impression(log, clicked, q):
+    """The impression with the most pairs of clicked rows, and the excess of D1 without it.
+    Descriptive; no part of the registration."""
+    pairs, expected = double_clicks(log, clicked), expected_pairs(log, q)
+    j = int(pairs.argmax())
+    return {
+        "rows": int(log.size[j]),
+        "clicks": int(clicks_by_impression(log, clicked)[j]),
+        "pairs": float(pairs[j]),
+        "share_of_pairs": float(pairs[j] / pairs.sum()),
+        "excess_without": float((pairs.sum() - pairs[j]) / (expected.sum() - expected[j]) - 1),
+    }
+
+
 def variance_ratio_terms(start, clicks, rows, minutes):
     """Numerator and denominator of `obd.posthoc.units.variance_ratio`, by pair of blocks kept."""
     block = start // (minutes * MINUTE_US)

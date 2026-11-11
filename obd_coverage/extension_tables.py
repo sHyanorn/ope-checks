@@ -117,9 +117,65 @@ def fitted_table(calibration):
             lines.append(line)
     head = ["Campaign", "Scenario"]
     for log in LOGS:
-        head += [f"{log}: size", "`T`", "`e_I`", "`e_S`"]
+        head += [f"{log}: nominal size", "`T`", "`e_I`", "`e_S`"]
     head += ["sessions per long group", "`e_L`", "`k` of `k_max`", "true IPS ratio"]
     return table([*head, "largest probability"], lines)
+
+
+def session_table(grid, calibration):
+    """The sessions of F by log: the nominal size and span that were fitted, the sessions that
+    the grouping forms, and the smallest `e_S` that any size and span of the grid solves to."""
+    lines = []
+    for campaign, name in NAMES.items():
+        measured = calibration[campaign]["direct"]
+        for log in LOGS:
+            fitted = measured["double_clicks"][log]["sessions"]
+            cells = {
+                (size, minutes): cell
+                for size, by_span in grid[campaign]["sessions"][log].items()
+                for minutes, cell in by_span.items()
+            }
+            at = cells[f"{fitted['size']:g}", str(fitted["minutes"])]
+            (size, minutes), least = min(cells.items(), key=lambda x: x[1]["solved"])
+            lines.append(
+                [
+                    name,
+                    log,
+                    f"{fitted['size']:g}",
+                    str(fitted["minutes"]),
+                    f"{at['impressions_per_session']:.2f}",
+                    f"{at['seen_from_an_impression']:.1f}",
+                    f"{max(0.0, measured['double_clicks'][log]['excess']):.1f}",
+                    f"{at['solved']:.1f}",
+                    f"{at['variance_ratio_at_1']:.2f}",
+                    f"{measured['variance_ratio'][log]['1']['ratio']:.2f}",
+                    f"{least['solved']:.1f} (size {size}, {minutes} min, "
+                    f"{least['variance_ratio_at_1']:.2f})",
+                ]
+            )
+    head = ["Campaign", "Log", "nominal size", "`T`", "impressions per session"]
+    head += ["as seen from an impression", "`e_I`", "solved `e_S`", "one-minute ratio: fitted"]
+    return table([*head, "real", "smallest solved `e_S` (where, its one-minute ratio)"], lines)
+
+
+def largest_impression_table(grid, calibration):
+    """Per log, the impression with the most pairs of clicked rows, and D1 without it."""
+    lines = [
+        [
+            name,
+            log,
+            str(found["rows"]),
+            str(found["clicks"]),
+            f"{found['pairs']:.0f}",
+            f"{found['share_of_pairs']:.1%}",
+            f"{calibration[campaign]['direct']['double_clicks'][log]['excess']:.1f}",
+            f"{found['excess_without']:.1f}",
+        ]
+        for campaign, name in NAMES.items()
+        for log, found in grid[campaign]["largest_impression"].items()
+    ]
+    head = ["Campaign", "Log", "rows", "clicks", "pairs", "share of `N2`", "`e_I^`", "without it"]
+    return table(head, lines)
 
 
 def variant_table(calibration, base):
@@ -299,6 +355,9 @@ def main():
     print("\n## D2\n\n" + variance_ratio_table(calibration))
     print("\n## D3 on the real clicks\n\n" + real_share_table(calibration))
     print("\n## Fitted scenarios\n\n" + fitted_table(calibration))
+    grid = json.loads((RESULTS / "posthoc.json").read_text())  # written after the reading
+    print("\n## Sessions of F\n\n" + session_table(grid, calibration))
+    print("\n## Largest impression\n\n" + largest_impression_table(grid, calibration))
     print("\n## Variants\n\n" + variant_table(calibration, base))
     for campaign, name in NAMES.items():
         print(

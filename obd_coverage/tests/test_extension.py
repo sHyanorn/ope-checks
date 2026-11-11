@@ -56,6 +56,22 @@ def test_the_fitted_scenario_takes_the_measured_excess_of_each_log(calibrated):
     assert (kinds.sum(axis=1) == 1).all()
 
 
+def test_the_grid_of_sessions_holds_the_fitted_one_and_the_sessions_it_forms(calibrated):
+    logs, base, calibration = calibrated
+    grid = extension.session_grid(logs, base, calibration["direct"], TARGET, "all")
+    for log, name in zip(logs, run.LOGS, strict=True):
+        fitted = calibration["direct"]["double_clicks"][name]["sessions"]
+        at = grid[name][f"{fitted['size']:g}"][str(fitted["minutes"])]
+        assert {key: at[key] for key in ("e", "solved", "variance_ratio_at_1")} == {
+            key: fitted[key] for key in ("e", "solved", "variance_ratio_at_1")
+        }
+        for by_span in grid[name].values():
+            for cell in by_span.values():
+                impressions = cell["sessions"] * cell["impressions_per_session"]
+                assert impressions == pytest.approx(len(log.start))
+                assert cell["seen_from_an_impression"] >= cell["impressions_per_session"]
+
+
 def test_the_measured_variance_ratios_are_the_published_statistic(calibrated):
     _, _, ext = calibrated
     ratios = ext["direct"]["variance_ratio"]["bts"]
