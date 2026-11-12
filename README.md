@@ -6,6 +6,8 @@ Pre-registered checks of published off-policy evaluation results. Each study liv
 
 The standard benchmark on the [Open Bandit Dataset](https://research.zozo.com/data.html) estimates the click rate of the Bernoulli Thompson sampling (BTS) policy from the uniform random logs and compares it with the click rate of the BTS logs. On the Men's campaign the estimate is about 0.89 of the on-policy value. This study asks how much of that gap comes from the evaluation target: the published prior is not the policy that was deployed during the logged week.
 
+The Open Bandit study is written up as a technical report, not peer-reviewed: [obd/report.pdf](obd/report.pdf).
+
 - [`obd/PREREGISTRATION.md`](obd/PREREGISTRATION.md): the propositions, statistics and decision rules, committed before any outcome of a confirmatory campaign was computed (`08ab8da`).
 - [`obd/AMENDMENTS.md`](obd/AMENDMENTS.md): readings of the registration fixed afterwards, each before any outcome of a confirmatory campaign was computed.
 - `obd/results/`: one JSON file per campaign, with every statistic, interval and label, the commit that produced it and the numpy version.
