@@ -109,6 +109,18 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
     assert ratio["mean"] == pytest.approx(first["variance_ratio"][:3, 1, 1].mean())
 
 
+def test_data_sets_drawn_under_other_inputs_are_refused(calibrated, tmp_path):
+    logs, calibration = calibrated
+    path = tmp_path / "all_M.npz"
+    run.simulate(logs, calibration, "all", "M", path, 1)
+    other = json.loads(json.dumps(calibration)) | {"e_impression": 0.0}
+    with pytest.raises(SystemExit, match="another calibration or scenario"):
+        run.simulate(logs, other, "all", "M", path, 1)
+    with pytest.raises(SystemExit, match="another calibration or scenario"):
+        run.saved(path, run.inputs("all", "M", other))
+    assert run.saved(path, run.inputs("all", "M", calibration))["done"] == 1
+
+
 def results(label_of, widening, at_60=None):
     """Results in which the label of a primary cell is `label_of(scenario, unit)`."""
     cells = {

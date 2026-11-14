@@ -150,6 +150,15 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
     assert all((whole[key] == again[key]).all() for key in ("estimate", "low", "residuals"))
 
 
+def test_data_sets_drawn_under_other_inputs_are_refused(calibrated, tmp_path):
+    logs, base, ext = calibrated
+    scenario, path = ext["scenarios"]["F"], tmp_path / "all_F.npz"
+    extension.simulate(logs, base, scenario, "all", "F", path, 1, False)
+    with pytest.raises(SystemExit, match="another calibration or scenario"):
+        extension.simulate(logs, base, scenario | {"low": 0.5}, "all", "F", path, 1, False)
+    assert run.saved(path, run.inputs("all", "F", base, scenario, False))["done"] == 1
+
+
 def test_which_scenarios_are_simulated_where():
     assert extension.data_sets("men", "F") == (4000, True)
     assert extension.data_sets("men", "FH") is None

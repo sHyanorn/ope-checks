@@ -7,6 +7,7 @@ python -m obd_coverage.run read        # writes results/coverage.json
 """
 
 import argparse
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -211,14 +212,34 @@ def calibrate(
     return out
 
 
+def inputs(*decisive):
+    """A digest of what decides the data sets of a simulation, kept with them."""
+    text = json.dumps(decisive, sort_keys=True, default=lambda x: x.tolist())
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+def saved(path, digest):
+    """The state of a simulation in `path`, whose data sets must have been drawn under `digest`."""
+    with np.load(path) as state:
+        if state.get("inputs") != digest:
+            raise SystemExit(
+                f"{path}: its data sets were drawn under another calibration or scenario; "
+                "remove it to draw them again"
+            )
+        return dict(state)
+
+
 def simulate(logs, calibration, campaign, scenario, path, n_data_sets):
     """Estimates, interval ends and standard deviations of replicates over the data sets.
 
-    Progress is kept in `path`, so an interrupted run continues where it stopped.
+    Progress is kept in `path`, so an interrupted run continues where it stopped, as long
+    as nothing that decides the data sets has changed.
     """
     c, x = data.CAMPAIGNS.index(campaign), SCENARIOS.index(scenario)
     shape = (n_data_sets, len(UNITS), len(QUANTITIES))
+    digest = inputs(campaign, scenario, calibration)
     state = {
+        "inputs": np.array(digest),
         "done": np.array(0),
         "estimate": np.empty((n_data_sets, len(QUANTITIES))),
         "low": np.empty(shape),
@@ -226,10 +247,8 @@ def simulate(logs, calibration, campaign, scenario, path, n_data_sets):
         "sd": np.empty(shape),
         "variance_ratio": np.empty((N_DESCRIBED, len(LOGS), len(RATIO_MINUTES))),
     }
-    if path.exists():
-        with np.load(path) as saved:
-            if saved["low"].shape == shape:
-                state = {name: saved[name].copy() for name in state}
+    if path.exists() and (resumed := saved(path, digest))["low"].shape == shape:
+        state = resumed
     setting = settings(logs, calibration, scenario, campaign)
     resampler = Resampler(*logs, np.random.default_rng([SEED, 3, c]))
     for s in range(int(state["done"]), n_data_sets):
@@ -432,12 +451,13 @@ def main():
     for campaign in data.CAMPAIGNS:
         results[campaign] = {}
         for scenario in SCENARIOS:
-            with np.load(args.work_dir / f"{campaign}_{scenario}.npz") as state:
-                if int(state["done"]) != args.data_sets:
-                    raise SystemExit(f"{campaign} {scenario}: {int(state['done'])} data sets done")
-                results[campaign][scenario] = summarise(
-                    state, calibration[campaign], scenario, target[campaign]
-                )
+            digest = inputs(campaign, scenario, calibration[campaign])
+            state = saved(args.work_dir / f"{campaign}_{scenario}.npz", digest)
+            if int(state["done"]) != args.data_sets:
+                raise SystemExit(f"{campaign} {scenario}: {int(state['done'])} data sets done")
+            results[campaign][scenario] = summarise(
+                state, calibration[campaign], scenario, target[campaign]
+            )
     results["reading"] = confirmatory(results)
     return _write("coverage.json", results)
 

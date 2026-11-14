@@ -354,7 +354,9 @@ def simulate(logs, base, scenario, campaign, name, path, n_data_sets, intervals)
     `run.simulate`; the sums of D3 on the first data sets; in F also D1 and D2."""
     c, x = data.CAMPAIGNS.index(campaign), SCENARIOS.index(name)
     shape = (n_data_sets, len(UNITS), len(QUANTITIES))
+    digest = run.inputs(campaign, name, base, scenario, intervals)
     state = {
+        "inputs": np.array(digest),
         "done": np.array(0),
         "estimate": np.empty((n_data_sets, len(QUANTITIES))),
         "low": np.empty(shape),
@@ -364,10 +366,8 @@ def simulate(logs, base, scenario, campaign, name, path, n_data_sets, intervals)
         "excess": np.empty((N_MEASURED, len(LOGS))),
         "variance_ratio": np.empty((N_MEASURED, len(LOGS), len(direct.RATIO_MINUTES))),
     }
-    if path.exists():
-        with np.load(path) as saved:
-            if saved["low"].shape == shape:
-                state = {key: saved[key].copy() for key in state}
+    if path.exists() and (resumed := run.saved(path, digest))["low"].shape == shape:
+        state = resumed
     setting = settings(logs, base, scenario, campaign)
     rate = np.array(base["rate"])
     q = [rate[log.cell] for log in logs]
@@ -646,18 +646,19 @@ def main():
             if not (planned := data_sets(campaign, name)):
                 continue
             scenario = calibration[campaign]["scenarios"][name]
-            with np.load(args.work_dir / f"{campaign}_{name}.npz") as state:
-                if int(state["done"]) != planned[0]:
-                    raise SystemExit(f"{campaign} {name}: {int(state['done'])} data sets done")
-                summary = {"data_sets": planned[0], "residuals": over(state["residuals"])}
-                if name in CONFIRMATORY:
-                    summary |= run.cells(state, scenario["truth"], scenario["predicted"])
-                if planned[1]:
-                    summary["sd_of_ips_ratio"] = run.widths(state, target[campaign])
-                if name == "F":
-                    measured = calibration[campaign]["direct"]
-                    summary["fit"] = fit(state, summary, measured, target[campaign])
-                results[campaign][name] = summary
+            digest = run.inputs(campaign, name, base[campaign], scenario, planned[1])
+            state = run.saved(args.work_dir / f"{campaign}_{name}.npz", digest)
+            if int(state["done"]) != planned[0]:
+                raise SystemExit(f"{campaign} {name}: {int(state['done'])} data sets done")
+            summary = {"data_sets": planned[0], "residuals": over(state["residuals"])}
+            if name in CONFIRMATORY:
+                summary |= run.cells(state, scenario["truth"], scenario["predicted"])
+            if planned[1]:
+                summary["sd_of_ips_ratio"] = run.widths(state, target[campaign])
+            if name == "F":
+                measured = calibration[campaign]["direct"]
+                summary["fit"] = fit(state, summary, measured, target[campaign])
+            results[campaign][name] = summary
     registered_reading = json.loads((run.RESULTS / "coverage.json").read_text())["reading"]
     results["reading"] = confirmatory(results, registered_reading) | {
         "explanation": {
