@@ -204,7 +204,7 @@ python -m obd_coverage.extension posthoc     # results/extension/posthoc.json; d
 python -m obd_coverage.extension_tables      # the tables of results/extension/
 ```
 
-The simulation keeps its progress in `~/.cache/ope-checks/coverage` (`--work-dir`) and continues from there. The results come from one run of commit `df8019a` (numpy 2.5.3). The extension keeps its progress in `~/.cache/ope-checks/coverage/extension`; its data sets come from one run of commits `2e4eee4` to `af23a3c`, which do not differ in the code that generates or resamples clicks (numpy 2.5.3, four processes with one thread each).
+The simulation keeps its progress in `~/.cache/ope-checks/coverage` (`--work-dir`) and continues from there when run with the same number of data sets, as long as the calibration and the scenario are those its data sets were drawn under. The results come from one run of commit `df8019a` (numpy 2.5.3); the `code_commit` of `coverage.json` is the commit of the step `read`, and no result file records the commit that drew the data sets. The extension keeps its progress in `~/.cache/ope-checks/coverage/extension`; its data sets come from one run of commits `2e4eee4` to `af23a3c`, which do not differ in the code that generates or resamples clicks (numpy 2.5.3, four processes with one thread each).
 
 | File | Content |
 |---|---|
