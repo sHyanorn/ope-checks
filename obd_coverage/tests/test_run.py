@@ -96,6 +96,14 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
     stamp = paths[0].stat().st_mtime_ns
     run.simulate(logs, calibration, "all", "M", paths[0], 3)
     assert paths[0].stat().st_mtime_ns == stamp
+    stopped = {name: x.copy() for name, x in first.items()} | {"done": np.array(2)}
+    for name in ("estimate", "low", "high", "sd", "variance_ratio"):
+        stopped[name][2:] = np.nan  # a run stopped after two data sets
+    np.savez(paths[1], **stopped)
+    run.simulate(logs, calibration, "all", "M", paths[1], 3)
+    with np.load(paths[1]) as resumed:
+        for name in ("estimate", "low", "high", "sd", "variance_ratio"):
+            assert (resumed[name][:3] == first[name][:3]).all()
     first["variance_ratio"][3:] = np.nan  # the rows of data sets that were not drawn
     summary = run.summarise(first, calibration, "M", TARGET)
     cell = summary["cells"]["ips_ratio"]["10"]

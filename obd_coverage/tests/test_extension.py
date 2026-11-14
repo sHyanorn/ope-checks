@@ -144,10 +144,13 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
     assert whole["residuals"].shape == (4, len(blocks.MINUTES), len(direct.SUMS))
     assert (whole["low"] < whole["estimate"][:, None] + 1e-12).all()
     assert np.isfinite(whole["excess"][:4]).all() and (whole["variance_ratio"][:4] > 0).all()
-    extension.simulate(logs, base, scenario, "all", "F", tmp_path / "b.npz", 2, True)
-    (tmp_path / "b.npz").rename(tmp_path / "c.npz")
-    again = run_to(4, tmp_path / "a.npz")
-    assert all((whole[key] == again[key]).all() for key in ("estimate", "low", "residuals"))
+    drawn = ("estimate", "low", "high", "sd", "residuals", "excess", "variance_ratio")
+    stopped = {key: x.copy() for key, x in whole.items()} | {"done": np.array(3)}
+    for key in drawn:
+        stopped[key][3:] = np.nan  # a run stopped after three data sets
+    np.savez(tmp_path / "b.npz", **stopped)
+    again = run_to(4, tmp_path / "b.npz")
+    assert all((again[key][:4] == whole[key][:4]).all() for key in drawn)
 
 
 def test_data_sets_drawn_under_other_inputs_are_refused(calibrated, tmp_path):
