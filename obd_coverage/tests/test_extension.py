@@ -84,11 +84,14 @@ def test_the_measured_variance_ratios_are_the_published_statistic(calibrated):
 
 def test_dependence_and_drift_are_solved_to_the_same_published_widening(calibrated):
     logs, base, ext = calibrated
-    for name in ("FH", "FS", "S"):
-        scenario = ext["scenarios"][name]
-        if not scenario["notes"]:
-            setting = extension.settings(logs, base, scenario, "all")
-            assert extension.widening(logs, setting) == pytest.approx(1.04, abs=1e-6)
+    strong = extension.spec(  # F with sessions strong enough that FH is not cut back
+        [x | {"excess": [50, 50, 0]} for x in ext["scenarios"]["F"]["logs"].values()]
+    )
+    long = extension.fit_long(logs, base, strong, "all", 1.04, 60)
+    assert not long["notes"]
+    for scenario in (long, ext["scenarios"]["FS"], ext["scenarios"]["S"]):
+        setting = extension.settings(logs, base, scenario, "all")
+        assert extension.widening(logs, setting) == pytest.approx(1.04, abs=1e-6)
     assert not ext["scenarios"]["FS"]["notes"] and not ext["scenarios"]["S"]["notes"]
     assert ext["scenarios"]["FS"]["logs"]["bts"]["drift"] > 0
     assert ext["scenarios"]["FS"]["logs"]["random"]["drift"] == 0
