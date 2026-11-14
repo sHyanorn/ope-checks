@@ -56,3 +56,11 @@ A record of an event, not a reading of the registration.
 - On 2026-11-10 at 11:10 UTC the confirmatory command `python -m obd.run all women` was started at commit `11e9340`. At about 11:28 UTC the host restarted and the process was gone. The checks of Section 2 had passed and the two logs of All had been converted to Parquet (11:12 UTC); the run was building the tables of All or resampling them. The logs of Women's had not been converted.
 - No result file had been written, the log was empty, and no statistic of a confirmatory campaign had been printed or seen.
 - The two Parquet files of All were deleted and the same command was run again at the same commit, from 11:31 to 11:44 UTC. It is the only run that completed, and the results in `obd/results/` are its output.
+
+## Correction, 2026-11-14
+
+Written after the results were known. Unlike entries 1 to 7, it reads no sentence of the registration and was not fixed before any outcome of a confirmatory campaign was computed, so the second and third sentences of the opening paragraph of this file do not hold for it. Under Section 9 of the registration it is post hoc. It changes no proposition, rule or result.
+
+- The last sentence of the first paragraph of Section 1, "No public source measures how much of the gap this accounts for.", was not true when it was written. Before `08ab8da`, three public repositories had estimated the BTS click rate against targets built from the BTS logs, and one of them compared such a target with the published prior on all three campaigns: `itsnjstyle27/counterfact` (commit `b626163`), `adeoluo/ad-auction-lab` (commit `c93ab28`) and `aghasalim/recsys-offline-online` (commit `9abef1e`).
+- The list "Public reports on the confirmatory campaigns" in Section 3 omits them.
+- What each reports, with its own qualifiers, is in `docs/obd-results.md`, "Earlier public work on the evaluation target".
