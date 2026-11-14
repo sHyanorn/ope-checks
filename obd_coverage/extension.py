@@ -446,13 +446,13 @@ def fit(state, summary, measured, target):
             "solved_from": solved_from,
         }
 
-    rows = []
+    rows, drawn = [], int(state["done"])
     for i, log in enumerate(LOGS):
-        low, high = np.percentile(state["excess"][:, i], [2.5, 97.5])
+        low, high = np.percentile(state["excess"][:drawn, i], [2.5, 97.5])
         real = measured["double_clicks"][log]["excess"]
         rows.append(row(f"excess within an impression, {log}", real, low, high, True))
         for k, minutes in enumerate(direct.RATIO_MINUTES):
-            low, high = np.percentile(state["variance_ratio"][:, i, k], [2.5, 97.5])
+            low, high = np.percentile(state["variance_ratio"][:drawn, i, k], [2.5, 97.5])
             real = measured["variance_ratio"][log][str(minutes)]["ratio"]
             name = f"variance ratio at {minutes} minutes, {log}"
             rows.append(row(name, real, low, high, minutes in (1, 10)))

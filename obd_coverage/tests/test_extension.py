@@ -238,9 +238,11 @@ def test_one_changed_label_makes_a_result_not_robust():
 def test_the_fit_says_which_statistics_the_fitted_scenario_reproduces():
     rng = np.random.default_rng(0)
     state = {
+        "done": np.array(300),
         "excess": rng.normal(3, 0.1, (400, 2)),
         "variance_ratio": rng.normal(1.5, 0.05, (400, 2, len(direct.RATIO_MINUTES))),
     }
+    state["excess"][300:] = state["variance_ratio"][300:] = np.nan  # data sets not drawn
     spread = {"p2.5": 0.9, "p97.5": 1.1}
     summary = {
         "sd_of_ips_ratio": {

@@ -96,6 +96,7 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
     stamp = paths[0].stat().st_mtime_ns
     run.simulate(logs, calibration, "all", "M", paths[0], 3)
     assert paths[0].stat().st_mtime_ns == stamp
+    first["variance_ratio"][3:] = np.nan  # the rows of data sets that were not drawn
     summary = run.summarise(first, calibration, "M", TARGET)
     cell = summary["cells"]["ips_ratio"]["10"]
     assert summary["data_sets"] == 3 and 0 <= cell["coverage"] <= 1
@@ -103,7 +104,9 @@ def test_a_simulation_is_reproducible_and_keeps_its_progress(calibrated, tmp_pat
         cell["predicted_coverage"] == calibration["predicted"]["M"]["ips_ratio"]["coverage"]["10"]
     )
     assert summary["sd_of_ips_ratio"]["over_ten_minutes"]["180"]["published"] == 1.04
-    assert summary["variance_ratio"]["bts"]["10"]["published"] == 1.1
+    ratio = summary["variance_ratio"]["bts"]["10"]
+    assert ratio["published"] == 1.1
+    assert ratio["mean"] == pytest.approx(first["variance_ratio"][:3, 1, 1].mean())
 
 
 def results(label_of, widening, at_60=None):

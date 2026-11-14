@@ -296,10 +296,11 @@ def summarise(state, calibration, scenario, target):
     """Section 8 for one scenario and campaign."""
     out = cells(state, calibration["truth"][scenario], calibration["predicted"][scenario])
     out["sd_of_ips_ratio"] = widths(state, target)
+    described = state["variance_ratio"][: int(state["done"])]
     out["variance_ratio"] = {
         log: {
             str(m): {
-                "mean": float(state["variance_ratio"][:, i, k].mean()),
+                "mean": float(described[:, i, k].mean()),
                 "published": target["variance_ratio"][log][m],
             }
             for k, m in enumerate(RATIO_MINUTES)
