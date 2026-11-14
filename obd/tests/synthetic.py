@@ -6,7 +6,6 @@ writes logs of the size of the All campaign to DIR and times the full run on the
 """
 
 import json
-import resource
 import sys
 import time
 import zipfile
@@ -92,6 +91,8 @@ def write_archive(data_dir, campaigns, rng):
 
 
 if __name__ == "__main__":
+    import resource
+
     directory = Path(sys.argv[1])
     sizes = {policy: data.ROWS[policy, "all"] for policy in ("random", "bts")}
     write_archive(directory, {"all": (80, sizes)}, np.random.default_rng(0))
