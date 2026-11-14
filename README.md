@@ -1,5 +1,7 @@
 # ope-checks
 
+[![CI](https://github.com/sHyanorn/ope-checks/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sHyanorn/ope-checks/actions/workflows/ci.yml?query=branch%3Amain)
+
 Pre-registered checks of published off-policy evaluation results. Each study lives in its own directory with its registration, code and results.
 
 ## obd: the shortfall on the Open Bandit Dataset
