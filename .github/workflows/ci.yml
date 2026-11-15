@@ -28,8 +28,10 @@ jobs:
         with:
           version: "0.11.32"
       - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore" study mips
-      - working-directory: ${{ runner.temp }}/rescore/src/icml2022-mips/src/real
-        run: ../../../../envs/mips/bin/python -c "import main, ope"
+      - run: $RESCORE_DIR/envs/study/bin/python -m pytest obd_rescore
+        env:
+          RESCORE_DIR: ${{ runner.temp }}/rescore
+          RESCORE_REQUIRE: mips
 
   blue:
     runs-on: ubuntu-24.04
@@ -39,8 +41,7 @@ jobs:
         with:
           version: "0.11.32"
       - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore" study blue
-      - run: >-
-          "$RUNNER_TEMP/rescore/envs/blue/bin/python" -I -c "import sys;
-          sys.path.insert(0, sys.argv[1]); import IPython;
-          from obp.ope import InverseProbabilityWeightingOptimalBaseline"
-          "$RUNNER_TEMP/rescore/src/recsys2024_optimal_baseline"
+      - run: $RESCORE_DIR/envs/study/bin/python -m pytest obd_rescore
+        env:
+          RESCORE_DIR: ${{ runner.temp }}/rescore
+          RESCORE_REQUIRE: blue
