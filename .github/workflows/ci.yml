@@ -18,3 +18,28 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
       - run: pytest
+
+  mips:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.32"
+      - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore" study mips
+      - working-directory: ${{ runner.temp }}/rescore/src/icml2022-mips/src/real
+        run: ../../../../envs/mips/bin/python -c "import main, ope"
+
+  blue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.32"
+      - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore" study blue
+      - run: >-
+          "$RUNNER_TEMP/rescore/envs/blue/bin/python" -I -c "import sys;
+          sys.path.insert(0, sys.argv[1]); import IPython;
+          from obp.ope import InverseProbabilityWeightingOptimalBaseline"
+          "$RUNNER_TEMP/rescore/src/recsys2024_optimal_baseline"
