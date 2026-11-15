@@ -19,7 +19,7 @@ jobs:
       - run: ruff format --check .
       - run: pytest
 
-  mips:
+  rescore:
     # torch 1.11 needs an executable stack, which newer glibc refuses
     runs-on: ubuntu-24.04
     steps:
@@ -27,21 +27,8 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.11.32"
-      - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore" study mips
+      - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore"
       - run: $RESCORE_DIR/envs/study/bin/python -m pytest obd_rescore
         env:
           RESCORE_DIR: ${{ runner.temp }}/rescore
-          RESCORE_REQUIRE: mips
-
-  blue:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
-        with:
-          version: "0.11.32"
-      - run: obd_rescore/setup.sh "$RUNNER_TEMP/rescore" study blue
-      - run: $RESCORE_DIR/envs/study/bin/python -m pytest obd_rescore
-        env:
-          RESCORE_DIR: ${{ runner.temp }}/rescore
-          RESCORE_REQUIRE: blue
+          RESCORE_REQUIRE: mips,blue
