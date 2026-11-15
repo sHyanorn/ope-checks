@@ -1,0 +1,101 @@
+{
+ "random/all": {
+  "rows": 1374327,
+  "item_ids": [
+   0,
+   79
+  ],
+  "positions": [
+   1,
+   2,
+   3
+  ],
+  "first_timestamp": "2019-11-24T00:00:00.007365+00:00",
+  "last_timestamp": "2019-11-30T23:59:59.408889+00:00",
+  "rows_outside_week": 0,
+  "stops": [],
+  "max_propensity_deviation": 0.0
+ },
+ "bts/all": {
+  "rows": 12357200,
+  "item_ids": [
+   0,
+   79
+  ],
+  "positions": [
+   1,
+   2,
+   3
+  ],
+  "first_timestamp": "2019-11-24T00:00:00.047846+00:00",
+  "last_timestamp": "2019-11-30T23:59:59.920907+00:00",
+  "rows_outside_week": 0,
+  "stops": []
+ },
+ "random/men": {
+  "rows": 452949,
+  "item_ids": [
+   0,
+   33
+  ],
+  "positions": [
+   1,
+   2,
+   3
+  ],
+  "first_timestamp": "2019-11-24T00:00:03.800821+00:00",
+  "last_timestamp": "2019-11-30T23:59:58.340081+00:00",
+  "rows_outside_week": 0,
+  "stops": [],
+  "max_propensity_deviation": 0.0
+ },
+ "bts/men": {
+  "rows": 4077727,
+  "item_ids": [
+   0,
+   33
+  ],
+  "positions": [
+   1,
+   2,
+   3
+  ],
+  "first_timestamp": "2019-11-24T00:00:00.020518+00:00",
+  "last_timestamp": "2019-11-30T23:59:58.483312+00:00",
+  "rows_outside_week": 0,
+  "stops": []
+ },
+ "random/women": {
+  "rows": 864585,
+  "item_ids": [
+   0,
+   45
+  ],
+  "positions": [
+   1,
+   2,
+   3
+  ],
+  "first_timestamp": "2019-11-24T00:00:00.686850+00:00",
+  "last_timestamp": "2019-11-30T23:59:57.920185+00:00",
+  "rows_outside_week": 0,
+  "stops": [],
+  "max_propensity_deviation": 0.0
+ },
+ "bts/women": {
+  "rows": 7765497,
+  "item_ids": [
+   0,
+   45
+  ],
+  "positions": [
+   1,
+   2,
+   3
+  ],
+  "first_timestamp": "2019-11-24T00:00:00.110777+00:00",
+  "last_timestamp": "2019-11-30T23:59:59.862983+00:00",
+  "rows_outside_week": 0,
+  "stops": []
+ }
+}

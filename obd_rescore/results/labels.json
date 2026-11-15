@@ -1,0 +1,79 @@
+{
+ "primary": {
+  "c1_all_blocks_own_against_the_target": "flips",
+  "c2_men_unbiasedness": "contradicted"
+ },
+ "c1": {
+  "all": {
+   "rows/published": {
+    "label_v_on": "holds",
+    "label_target": "flips"
+   },
+   "blocks/published": {
+    "label_v_on": "holds",
+    "label_target": "holds"
+   },
+   "rows/own": {
+    "label_v_on": "flips",
+    "label_target": "flips"
+   },
+   "blocks/own": {
+    "label_v_on": "flips",
+    "label_target": "flips"
+   }
+  },
+  "men": {
+   "rows/published": {
+    "label_v_on": "undecided",
+    "label_target": "holds"
+   },
+   "blocks/published": {
+    "label_v_on": "flips",
+    "label_target": "holds"
+   },
+   "rows/own": {
+    "label_v_on": "flips",
+    "label_target": "flips"
+   },
+   "blocks/own": {
+    "label_v_on": "flips",
+    "label_target": "flips"
+   }
+  },
+  "women": {
+   "rows/published": {
+    "label_v_on": "holds",
+    "label_target": "holds"
+   },
+   "blocks/published": {
+    "label_v_on": "undecided",
+    "label_target": "holds"
+   },
+   "rows/own": {
+    "label_v_on": "flips",
+    "label_target": "flips"
+   },
+   "blocks/own": {
+    "label_v_on": "flips",
+    "label_target": "flips"
+   }
+  }
+ },
+ "c2": {
+  "all": {
+   "unbiasedness": "not contradicted",
+   "label_v_on": "flips",
+   "label_target": "flips"
+  },
+  "men": {
+   "unbiasedness": "contradicted",
+   "label_v_on": "holds",
+   "label_target": "flips"
+  },
+  "women": {
+   "unbiasedness": "not contradicted",
+   "label_v_on": "flips",
+   "label_target": "flips"
+  }
+ }
+}
