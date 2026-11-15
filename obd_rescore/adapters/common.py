@@ -1,4 +1,4 @@
-"""What both adapters share: their records and the files they use."""
+"""What both adapters share: ten-minute blocks, their records and the files they use."""
 
 import hashlib
 import json
@@ -6,6 +6,27 @@ import os
 import sys
 from importlib import metadata
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+WEEK_START_NS = 1_574_553_600_000_000_000  # 2019-11-24T00:00:00Z
+BLOCK_NS = 600_000_000_000
+N_BLOCKS = 1008
+
+
+def blocks(timestamps):
+    """The ten-minute block of each timestamp (strings of obp's data, in its order)."""
+    t = pd.to_datetime(timestamps, utc=True).values.astype("int64")
+    block = (t - WEEK_START_NS) // BLOCK_NS
+    if not ((block >= 0) & (block < N_BLOCKS)).all():
+        raise SystemExit("a row lies outside the week")
+    return block
+
+
+def block_rows(block, m):
+    """Each row repeated in place as often as its block is drawn (departure 5)."""
+    return np.repeat(np.arange(len(block)), m[block])
 
 
 def sha256(path):
