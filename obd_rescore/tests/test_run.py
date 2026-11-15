@@ -94,8 +94,9 @@ def test_the_run_computes_the_replications_first_and_resumes(small, monkeypatch)
     c1 = (results / "c1.json").read_text()
     assert registered.run(small, SIZES, slots=4, commit="c") == first
     assert (results / "c1.json").read_text() == c1
-    events = (results / "provenance.json").read_text()
-    assert [x["event"] for x in json.loads(events)["events"]].count("start") == 2
+    about = json.loads((results / "provenance.json").read_text())
+    assert [x["event"] for x in about["events"]].count("start") == 2
+    assert about["study"]["float_parsing"] == logs.float_parsing()
 
     target = small / "run" / "c2" / "women" / "target.npy"
     np.save(target, np.load(target) * (1 + 2e-9))

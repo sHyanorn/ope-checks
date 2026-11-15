@@ -44,6 +44,21 @@ def test_tables_add_up_across_chunks(archive, monkeypatch):
         np.testing.assert_allclose(parts[name], table, rtol=1e-12, atol=0)
 
 
+def test_the_float_parsing_check_counts_the_values_a_mode_parses_otherwise(monkeypatch):
+    read_csv = pd.read_csv
+
+    def nudged(text, float_precision):
+        frame = read_csv(text, float_precision=float_precision)
+        if float_precision == "high":
+            frame.iloc[:7, 0] = np.nextafter(frame.iloc[:7, 0], 1)
+        return frame
+
+    monkeypatch.setattr(pd, "read_csv", nudged)
+    record = logs.float_parsing()
+    assert record["n_strings"] == 2_100_000
+    assert record["differ_from_float"] == {"None": 0, "round_trip": 0, "high": 7}
+
+
 def test_blocks_are_utc_ten_minute_intervals_of_the_week():
     stamps = [
         "2019-11-24 00:00:00.000000+00:00",

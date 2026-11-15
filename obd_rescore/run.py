@@ -307,6 +307,7 @@ def provenance(r, commit):
             "numpy": np.__version__,
             "pandas": pd.__version__,
             "pyarrow": pyarrow.__version__,
+            "float_parsing": logs.float_parsing(),
         },
         "third_party_commits": {},
     }

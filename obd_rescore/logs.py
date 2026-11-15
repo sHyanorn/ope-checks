@@ -1,8 +1,11 @@
 """The logs on this study's side: reading, the files obp reads, ten-minute blocks.
 
-Logs are read from the archive with `float_precision="round_trip"` (Section 3).
+Logs are read from the archive with `float_precision="round_trip"` (Section 3), which
+pandas 3.1 no longer distinguishes from the default; `float_parsing` records the check.
 """
 
+import io
+import warnings
 import zipfile
 
 import numpy as np
@@ -14,6 +17,7 @@ from obd.data import BLOCK_US, N_BLOCKS, WEEK_START_US
 
 ROOT = "open_bandit_dataset"
 SAMPLE = 100_000  # rows of a run of C1
+FLOAT_PRECISION = "round_trip"  # Section 3
 
 
 def member(policy, campaign, name=None):
@@ -27,8 +31,44 @@ def chunks(data_dir, policy, campaign, columns, chunksize=2_000_000):
         archive.open(member(policy, campaign)) as f,
     ):
         yield from pd.read_csv(
-            f, usecols=columns, float_precision="round_trip", chunksize=chunksize
+            f, usecols=columns, float_precision=FLOAT_PRECISION, chunksize=chunksize
         )
+
+
+def float_parsing():
+    """How read_csv parses floats in this environment, for the provenance of the run."""
+    rng = np.random.default_rng(0)
+    n, m = 500_000, 300_000
+    values = [rng.random(n), rng.random(n) * 1e-4, 1 / rng.integers(1, 10**6, n)]
+    values = np.concatenate(values).tolist()
+    strings = [repr(x) for x in values]
+    strings += [f"{x:.17g}" for x in values[:m]] + [f"{x:.18f}" for x in values[:m]]
+    expected = np.array([float(s) for s in strings])
+    text = "x\n" + "\n".join(strings)
+    differ, messages = {}, set()
+    for mode in (None, "round_trip", "high"):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            parsed = pd.read_csv(io.StringIO(text), float_precision=mode)["x"].to_numpy()
+        differ[str(mode)] = int((parsed != expected).sum())
+        messages.update(f"{type(w.message).__name__}: {w.message}" for w in caught)
+    return {
+        "float_precision_of_the_logs": FLOAT_PRECISION,
+        "note": (
+            "pandas deprecated float_precision in 3.1.0; since then every mode uses the same "
+            "converter (read_csv documentation). The logs are read with "
+            "float_precision='round_trip', as registered."
+        ),
+        "method": (
+            "Parse with read_csv, with float_precision None, 'round_trip' and 'high', the repr "
+            f"of {3 * n} draws of numpy default_rng(0) ({n} each of random(), random() * 1e-4 "
+            f"and 1 / integers(1, 10**6)) and the first {m} of them with %.17g and with %.18f; "
+            "count the values that differ from Python's float() of the same string."
+        ),
+        "n_strings": len(strings),
+        "differ_from_float": differ,
+        "warnings": sorted(messages),
+    }
 
 
 def extract(data_dir, out_dir, logs):
