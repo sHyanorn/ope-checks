@@ -1,0 +1,3 @@
+# The adapters run in the environments of the published codes, the oldest on Python 3.9.
+extend = "../../pyproject.toml"
+target-version = "py39"

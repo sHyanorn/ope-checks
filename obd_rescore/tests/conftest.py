@@ -11,19 +11,15 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from obd_rescore import logs
+from obd_rescore import envs, logs
 from obd_rescore.tests import synthetic
 
 DIR = Path(os.environ.get("RESCORE_DIR", Path.home() / ".cache" / "ope-checks" / "rescore"))
-SOURCES = {
-    "mips": DIR / "src" / "icml2022-mips" / "src" / "real",
-    "blue": DIR / "src" / "recsys2024_optimal_baseline",
-    "notebook": DIR / "src" / "meta-ope-recsys-2025" / "BLUE OPE.ipynb",
-}
+SOURCES = envs.sources(DIR)
 
 
 def python(env):
-    path = DIR / "envs" / env / "bin" / "python"
+    path = envs.python(DIR, env)
     if path.exists():
         return path
     if env in os.environ.get("RESCORE_REQUIRE", "").split(","):
@@ -31,13 +27,21 @@ def python(env):
     pytest.skip(f"no environment {env} in {DIR}")
 
 
-def run(env, code, *args, cwd=None):
-    """Run `code` in an environment; returns its standard output."""
-    done = subprocess.run(
-        [python(env), "-I", "-c", code, *map(str, args)], capture_output=True, text=True, cwd=cwd
-    )
+def call(command, cwd=None):
+    done = subprocess.run(command, capture_output=True, text=True, cwd=cwd, env=envs.environ())
     assert done.returncode == 0, done.stderr[-3000:]
     return done.stdout
+
+
+def run(env, code, *args, cwd=None):
+    """Run `code` in an environment; returns its standard output."""
+    return call([python(env), "-I", "-c", code, *map(str, args)], cwd)
+
+
+def adapter(env, *args):
+    """Run an adapter in its environment; returns its standard output."""
+    python(env)
+    return call(envs.adapter(DIR, env, *args))
 
 
 ITEMS = {"all": 80, "men": 34, "women": 46}
