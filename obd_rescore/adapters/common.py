@@ -17,7 +17,8 @@ N_BLOCKS = 1008
 
 def blocks(timestamps):
     """The ten-minute block of each timestamp (strings of obp's data, in its order)."""
-    t = pd.to_datetime(timestamps, utc=True).values.astype("int64")
+    iso = {"format": "ISO8601"} if int(pd.__version__.split(".")[0]) >= 2 else {}
+    t = pd.to_datetime(timestamps, utc=True, **iso).values.astype("int64")
     block = (t - WEEK_START_NS) // BLOCK_NS
     if not ((block >= 0) & (block < N_BLOCKS)).all():
         raise SystemExit("a row lies outside the week")
@@ -79,7 +80,8 @@ class Record:
 
     def check(self, compute):
         """`compute(line)` must give the last line again."""
-        if self.lines and compute(self.lines[-1]) != self.lines[-1]:
+        last = self.lines[-1] if self.lines else None
+        if last and json.dumps(compute(last), sort_keys=True) != json.dumps(last, sort_keys=True):
             raise SystemExit(f"{self.path}: the resumed process does not repeat its last line")
 
     def write(self, line):

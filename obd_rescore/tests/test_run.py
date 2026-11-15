@@ -7,7 +7,7 @@ import pytest
 
 from obd import data
 from obd.tests.synthetic import raw_log, uniform
-from obd_rescore import logs
+from obd_rescore import logs, rules
 from obd_rescore import run as registered
 from obd_rescore.tests import synthetic
 from obd_rescore.tests.conftest import DIR, ITEMS, python
@@ -67,8 +67,27 @@ def test_the_run_computes_the_replications_first_and_resumes(small, monkeypatch)
         assert out["unbiasedness"]["replicates"] == SIZES["replicates"]
         assert max(abs(d) for d in out["compact_minus_full"].values()) < 1e-12
     for campaign in ITEMS:
-        lines = (results / "c1" / f"{campaign}.jsonl").read_text().splitlines()
+        lines = [json.loads(x) for x in (results / "c1" / campaign).with_suffix(".jsonl").open()]
         assert len(lines) == SIZES["runs"] * 4
+        for arm, target in [("rows", "published"), ("blocks", "own")]:
+            runs = sorted(
+                (x for x in lines if (x["arm"], x["target"]) == (arm, target)), key=lambda x: x["t"]
+            )
+            cell = first["c1"][campaign]["cells"][f"{arm}/{target}"]
+            for name in ("r_ips", "r_snips") if campaign == "men" else ("r_ips",):
+                again = rules.compare(
+                    [x["mips_slope"] for x in runs],
+                    [x["ips"] for x in runs],
+                    [x[name] for x in runs],
+                )
+                assert again == cell["comparisons"][name]
+        replicates = [
+            json.loads(x) for x in (results / "c2" / campaign).with_suffix(".jsonl").open()
+        ]
+        assert len(replicates) == SIZES["replicates"] and "v_on_i" in replicates[0]
+    labels = json.loads((results / "labels.json").read_text())
+    primary = first["c1"]["all"]["cells"]["blocks/own"]["label_target"]
+    assert labels["primary"]["c1_all_blocks_own_against_the_target"] == primary
 
     men = small / "run" / "c1" / "men.jsonl"
     men.write_text("".join(men.read_text().splitlines(keepends=True)[:-3]))
@@ -80,6 +99,9 @@ def test_the_run_computes_the_replications_first_and_resumes(small, monkeypatch)
 
     target = small / "run" / "c2" / "women" / "target.npy"
     np.save(target, np.load(target) * (1 + 2e-9))
+    with pytest.raises(SystemExit, match="differs from BLUE's IPS"):
+        registered.run(small, SIZES, slots=4, commit="c")
+    np.save(target, np.load(target) * np.nan)
     with pytest.raises(SystemExit, match="differs from BLUE's IPS"):
         registered.run(small, SIZES, slots=4, commit="c")
 

@@ -9,6 +9,7 @@ from obd_rescore import envs, logs, references
 from obd_rescore.tests import synthetic
 from obd_rescore.tests.conftest import ITEMS, POLICIES, SOURCES, adapter, run
 from obd_rescore.tests.test_logs import frame
+from obd_rescore.tests.test_mips import EDGES
 
 # enough clicks at each position for the reward model's five folds
 ROWS = {"random": 20_000, "bts": 3000}
@@ -122,3 +123,9 @@ def test_t6_t7_replicates_hold_the_drawn_blocks_and_ips_is_the_reference(data, t
     np.testing.assert_allclose(ours["r_ips"], published["IPS"][0], rtol=1e-12)
     np.testing.assert_allclose(ours["r_snips"], published["SNIPS"][0], rtol=1e-12)
     np.testing.assert_allclose(lines[0]["IPS"], published["IPS"][0], rtol=1e-12)
+
+
+def test_t6_blocks_in_this_environment_read_timestamps_with_and_without_fractions():
+    code = "import json, sys; sys.path.insert(0, sys.argv[1]); import pandas as pd, blue; "
+    code += "print(json.dumps(blue.blocks(pd.Series(json.loads(sys.argv[2]))).tolist()))"
+    assert json.loads(run("blue", code, envs.ADAPTERS, json.dumps(EDGES))) == [0, 0, 1, 1, 2, 1007]

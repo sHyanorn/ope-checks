@@ -134,6 +134,7 @@ EDGES = [
     "2019-11-24 00:09:59.999999+00:00",
     "2019-11-24 00:10:00.000000+00:00",
     "2019-11-24 09:10:00.000000+09:00",
+    "2019-11-24 00:20:00+00:00",  # a whole second, written without its fraction
     "2019-11-30 23:59:59.999999+00:00",
 ]
 
@@ -144,7 +145,7 @@ def test_t6_a_block_run_holds_each_row_as_often_as_its_block_is_drawn(extracted)
     out = json.loads(run("mips", BLOCKS, *args))
     block = np.array(out["block"])
     assert (block == logs.blocks(pd.Series(out["timestamps"]))).all()
-    assert out["edges"] == [0, 0, 1, 1, 1007]
+    assert out["edges"] == [0, 0, 1, 1, 2, 1007]
     assert out["outside"] == "a row lies outside the week"
     rows = np.array(out["rows"])
     assert (np.diff(rows) >= 0).all()  # in place, in obp's order

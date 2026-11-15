@@ -151,10 +151,9 @@ def replication(r):
     v_on = {c: logs.on_policy_value(r.tables("bts", c)) for c in ("all", "men")}
     n = r.sizes["replication_runs"]
     halves = [(0, n // 2 - 1), (n // 2, n - 1)]
-    r.jobs(r.targets("all"))
+    r.jobs(r.targets("all") + r.full("men"))
     only = ["--arms", "rows", "--targets", "published", "--estimators", "ips", "mips_slope"]
-    jobs = [r.c1(f"replication_{a}", "all", *only, "--first", a, "--last", b) for a, b in halves]
-    r.jobs(jobs + r.full("men"))
+    r.jobs([r.c1(f"replication_{a}", "all", *only, "--first", a, "--last", b) for a, b in halves])
     lines = sorted(
         (x for a, _ in halves for x in r.read(f"c1/replication_{a}")), key=lambda x: x["t"]
     )
@@ -202,7 +201,9 @@ def c1_campaign(r, campaign, v_on, random):
     """Every cell of C1 on one campaign, and its lines run by run."""
     n, men = r.sizes["runs"], campaign == "men"
     files = [f"{campaign}_rows", f"{campaign}_blocks"] if campaign == "all" else [campaign]
-    lines = {(x["t"], x["arm"], x["target"]): x for f in files for x in r.read(f"c1/{f}")}
+    read = [x for f in files for x in r.read(f"c1/{f}")]
+    lines = {(x["t"], x["arm"], x["target"]): x for x in read}
+    assert len(read) == len(lines), f"{campaign}: a run was written twice"
     assert sorted(lines) == sorted((t, a, g) for t in range(n) for a in ARMS for g in TARGETS)
     pis = np.load(r.pi(campaign))[:n]
     out = {"cells": {}, "mean_r_ips_over_v_on": {}}
@@ -214,6 +215,8 @@ def c1_campaign(r, campaign, v_on, random):
         out["mean_r_ips_over_v_on"][target] = float(np.mean(values["r_ips"] / v_on))
         for arm in ARMS:
             runs = [lines[t, arm, target] for t in range(n)]
+            for t, x in enumerate(runs):
+                x |= {name: float(v[t]) for name, v in refs.items() if name != "v_on"}
             estimates = {k: np.array([x[k] for x in runs]) for k in C1_ESTIMATORS}
             cell = c1_cell(estimates, refs, v_on, men)
             rows = [x["rows"] for x in runs]
@@ -242,6 +245,8 @@ def c2_campaign(r, campaign, v_on, r_values, bts):
     draws = {name: np.array([x[name] for x in lines]) for name in ("BLUE", *OTHERS)}
     m = np.load(r.state / "c2" / "blocks.npy")[: len(lines)].astype(float)
     v_on_i = (m @ bts["clicks"].sum(axis=(1, 2))) / (m @ bts["rows"].sum(axis=(1, 2)))
+    for x, v in zip(lines, v_on_i, strict=True):
+        x["v_on_i"] = float(v)
     refs = {"v_on": v_on, "r_ips": r_values["r_ips"]}
     if campaign == "men":
         refs["r_snips"] = r_values["r_snips"]
@@ -264,6 +269,30 @@ def c2_campaign(r, campaign, v_on, r_values, bts):
         "replicate_sd": {name: float(np.std(x, ddof=1)) for name, x in draws.items()},
         "replicate_rows": [min(x["rows"] for x in lines), max(x["rows"] for x in lines)],
     }, lines
+
+
+def labels(c1_results, c2_results):
+    """Every label, with the primary labels of Section 8.4 first."""
+    c1 = {
+        c: {
+            cell: {k: x[k] for k in ("label_v_on", "label_target")}
+            for cell, x in out["cells"].items()
+        }
+        for c, out in c1_results.items()
+    }
+    c2 = {
+        c: {
+            "unbiasedness": x["unbiasedness"]["label"],
+            "label_v_on": x["label_v_on"],
+            "label_target": x["label_target"],
+        }
+        for c, x in c2_results.items()
+    }
+    primary = {
+        "c1_all_blocks_own_against_the_target": c1["all"]["blocks/own"]["label_target"],
+        "c2_men_unbiasedness": c2["men"]["unbiasedness"],
+    }
+    return {"primary": primary, "c1": c1, "c2": c2}
 
 
 def provenance(r, commit):
@@ -305,6 +334,8 @@ def provenance(r, commit):
 
 def run(work_dir=WORK_DIR, sizes=SIZES, slots=4, commit=None):
     """Section 9: the stop checks, both replications, then everything else."""
+    if not np.__version__.startswith("2.5."):
+        raise SystemExit("the registered random streams are those of numpy 2.5")
     r = Run(work_dir, sizes, slots)
     r.event(event="start", commit=commit)
     about = provenance(r, commit)
@@ -321,6 +352,8 @@ def run(work_dir=WORK_DIR, sizes=SIZES, slots=4, commit=None):
     if not (r.state / "replication.json").exists():
         dump(r.state / "replication.json", replication(r))
         r.event(event="replications written")
+    RESULTS.mkdir(exist_ok=True)
+    dump(RESULTS / "replication.json", json.loads((r.state / "replication.json").read_text()))
 
     tables = {(p, c): r.tables(p, c) for c in N_ITEMS for p in ("random", "bts")}
     v_on = {c: logs.on_policy_value(tables["bts", c]) for c in N_ITEMS}
@@ -331,6 +364,8 @@ def run(work_dir=WORK_DIR, sizes=SIZES, slots=4, commit=None):
     on_policy = r.state / "c2" / "on_policy_men.json"
     args = ["on-policy", r.src["blue"], r.obp_data, "men", on_policy]
     on_policy_job = [("on_policy_men", envs.adapter(r.work, "blue", *args))]
+    # the full data of All (about 9.8 GB) with the targets only; then the full data of
+    # Women's with obp's V_on of Men's (about 3.7 and 6.2 GB)
     r.jobs(r.full("all") + r.targets("men") + r.targets("women"))
     r.jobs(r.full("women") + ([] if on_policy.exists() else on_policy_job))
     last = ["--last", sizes["runs"] - 1]
@@ -353,6 +388,20 @@ def run(work_dir=WORK_DIR, sizes=SIZES, slots=4, commit=None):
         read += [r.full_data(campaign)["rows"], r.read(f"c2/{campaign}_compact")[0]["rows"]]
         if set(read) != {data.ROWS["random", campaign]}:
             raise SystemExit(f"obp read {read} rows of the random log of {campaign}")
+    for campaign in N_ITEMS:  # the adapters drew the blocks this side numbers
+        per_block = tables["random", campaign]["rows"].sum(axis=(1, 2))
+        c1_blocks = np.load(r.state / "c1" / f"blocks_{campaign}.npy") @ per_block
+        file = "all_blocks" if campaign == "all" else campaign
+        c1_rows = {x["t"]: x["rows"] for x in r.read(f"c1/{file}") if x["arm"] == "blocks"}
+        c2_rows = [
+            x["rows"] for x in sorted(r.read(f"c2/{campaign}_replicates"), key=lambda x: x["i"])
+        ]
+        if c1_rows != dict(enumerate(c1_blocks[: sizes["runs"]])) or c2_rows != list(
+            np.load(c2_blocks)[: sizes["replicates"]] @ per_block
+        ):
+            raise SystemExit(
+                f"the adapters and this side assign the rows of {campaign} to other blocks"
+            )
     main_rows = {x["t"]: x for x in r.read("c1/all_rows") if x["target"] == "published"}
     halves = (0, sizes["replication_runs"] // 2)
     for x in (x for a in halves for x in r.read(f"c1/replication_{a}")):
@@ -369,8 +418,8 @@ def run(work_dir=WORK_DIR, sizes=SIZES, slots=4, commit=None):
             name: abs(r_values[campaign][key] / blue[name][0] - 1)
             for key, name in (("r_ips", "IPS"), ("r_snips", "SNIPS"))
         }
-    if max(d for c in check.values() for d in c.values()) > STOP_DIFFERENCE:
-        dump(r.state / "stop.json", check)
+    if not all(d <= STOP_DIFFERENCE for c in check.values() for d in c.values()):
+        dump(RESULTS / "stop.json", check)
         raise SystemExit(f"R_IPS or R_SNIPS differs from BLUE's IPS or SNIPS: {check}")
 
     c1_results, c2_results, lines = {}, {}, {}
@@ -403,8 +452,8 @@ def run(work_dir=WORK_DIR, sizes=SIZES, slots=4, commit=None):
     RESULTS.mkdir(exist_ok=True)
     dump(RESULTS / "provenance.json", about | {"sizes": sizes, "events": events})
     dump(RESULTS / "checks.json", checks)
-    dump(RESULTS / "replication.json", json.loads((r.state / "replication.json").read_text()))
     dump(RESULTS / "references.json", refs)
+    dump(RESULTS / "labels.json", labels(c1_results, c2_results))
     dump(RESULTS / "c1.json", c1_results)
     dump(RESULTS / "c2.json", c2_results)
     for (claim, campaign), rows in lines.items():
@@ -423,8 +472,8 @@ def code_commit():
         )
         return done.stdout.strip()
 
-    if git("status", "--porcelain", "--", ".", ":(exclude)results"):
-        raise SystemExit("obd_rescore differs from its commit")
+    if git("status", "--porcelain", "--", ".", "../obd", ":(exclude)results"):
+        raise SystemExit("obd_rescore or obd differs from its commit")
     return git("rev-parse", "HEAD")
 
 
@@ -439,7 +488,12 @@ def main():
         started = {x["commit"] for x in lines if x["event"] == "start"}
         if started - {commit}:
             raise SystemExit(f"the run was started at {started}, not at {commit}")
-    run(args.work_dir, commit=commit)
+    try:
+        run(args.work_dir, commit=commit)
+    except SystemExit as stop:
+        with open(events, "a") as f:
+            f.write(json.dumps({"time": now(), "event": "stopped", "reason": str(stop)}) + "\n")
+        raise
 
 
 if __name__ == "__main__":
