@@ -20,7 +20,8 @@ jobs:
       - run: pytest
 
   mips:
-    runs-on: ubuntu-latest
+    # torch 1.11 needs an executable stack, which newer glibc refuses
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -31,7 +32,7 @@ jobs:
         run: ../../../../envs/mips/bin/python -c "import main, ope"
 
   blue:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
