@@ -80,6 +80,10 @@ The first run downloads the dataset archive (413 MB) and the prior file to `~/.c
 
 [`obd_coverage/`](obd_coverage/README.md) is a semi-synthetic study of the intervals used above: the logs keep their rows, get clicks from a known process, and the coverage of nominal 95% intervals is counted by resampling unit and kind of dependence. It changes no registered file, result or label of `obd`.
 
+## obd_rescore
+
+[`obd_rescore/`](obd_rescore/README.md) re-scores two published estimator comparisons on the dataset against `R_IPS`, the IPS of the evaluated target on the whole random log, which is unbiased for the target's value, as well as against `V_on`. The registration was committed before any code of the published comparisons was run on the dataset and before any estimate, reference or interval of the study was computed from it (`78c077a`); the results come from one run of commit `d30353f`. Both replications are "reproduced". Primary labels: MIPS (w/ SLOPE) against IPS on All, with ten-minute blocks and the target applied to its own (item, position) pairs, "flips" against `R_IPS` (MIPS (w/ SLOPE) closer in 91 of 500 runs); on Men's the interval of `BLUE - IPS` over 2,000 block replicates, 0.000107 to 0.000898, excludes 0, so "BLUE remains unbiased" is "contradicted" at the full size of the data, with the reward model and the target fixed. It changes no registered file, result or label of `obd`.
+
 ## Layout
 
-`obd/` holds the study: `data.py` (download, checksums, stop checks), `tables.py`, `estimators.py` (H1 to H7 and the exploratory item), `verdicts.py` (the decision rules) and `run.py` (bootstrap, labels, result files). `obd/posthoc/` holds the post hoc analyses. MIT licence.
+`obd/` holds the study: `data.py` (download, checksums, stop checks), `tables.py`, `estimators.py` (H1 to H7 and the exploratory item), `verdicts.py` (the decision rules) and `run.py` (bootstrap, labels, result files). `obd/posthoc/` holds the post hoc analyses. `obd_rescore/` holds the re-scoring: `setup.sh` and `locks/` (the three environments), `adapters/` (one per published code), `rules.py` (the decision rules) and `run.py` (the run and its result files). MIT licence.
