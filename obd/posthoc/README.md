@@ -1,22 +1,28 @@
 # Post hoc analyses
 
-Everything in this directory was fixed after the confirmatory results were known. The analyses are descriptive. They give no verdict and they replace or reinterpret no registered label; the registration, its amendments and the files in `obd/results/` are unchanged.
+Everything in this directory was fixed after the confirmatory results were known. The analyses are descriptive: none gives a verdict or changes a registered label, and the registration and the files in `obd/results/` are unchanged.
 
 ```
 python -m obd.posthoc.run
 ```
 
-writes `results/units.json`, `results/features.json`, `results/propensities.json`, `results/blocks.json`, `results/lengths.json`, `results/distances.json` and `results/prior.json`. The numbers of Sections 1 to 3 come from one run of commit `41969f3` (numpy 2.5.4); Sections 4 to 7 name their own runs. Intervals are 2.5th and 97.5th percentiles of 10,000 replicates. Wherever ten-minute blocks are resampled, the multiplicities are the registered ones.
+writes the seven files of `results/` (`units`, `features`, `propensities`, `blocks`, `lengths`, `distances`, `prior`). Sections 1 to 3 come from one run of commit `41969f3` (numpy 2.5.4); Sections 4 to 7 name their own runs. Intervals are 2.5th and 97.5th percentiles of 10,000 replicates; ten-minute blocks use the registered multiplicities.
+
+## Results at a glance
+
+| Section | Question | Result | Main limit |
+|---|---|---|---|
+| 1 | Are intervals from rows or impressions narrower than from blocks? | Blocks give a standard deviation 1.31 to 1.47 times larger. On All and Women's every interval contains 1; on Men's only the block interval does. | Variance ratios carry no interval. |
+| 2 | What follows if the unmatched user feature is matched? | Joint distance 0.007 (All) and 0.009 (Women's) against registered references of 0.006 to 0.015; change in `rho` 0.001 and -0.001. | The two values being one category is an inference. |
+| 3 | Why is `M` below 1 (0.973, 0.967)? | Low hours hold 0.033 (All) and 0.022 (Women's) of the distance, 0.002 on Men's; `M` is below 1 on 27 and 29 November on both. | The cause is not identified. |
+| 4 | Does the width depend on the block length? | On Men's it does not, as registered. On All, Women's and the pooled unit the standard deviation is 0.95 to 0.97 of the ten-minute one at 5 minutes and 1.13 to 1.36 at 180 (IPS), and every H3 interval still contains 1 at all six lengths. | Dependence beyond ten minutes and change over the week are not separated. |
+| 5 | Do the intervals of H4, H5, H6 move with the block length? | `rho` contains 1 at every length; the pooled lower end of `d` is 0.0011 to 0.0040; the SNIPS half-width is 0.0927 to 0.1015 against 0.10; the H5 interval contains 0 at 60 minutes on both campaigns. | Several ends lie within two Monte Carlo errors of their value; long blocks interfere with H5. |
+| 6 | Is the BTS distribution fixed and different from the prior, or changing? | `A` 0.386 and 0.413 against references of 0.012 and 0.010; `E` 3.0 and 3.4 times `D0`; `D - A` between `D0` and `2 x D0`. | The distances bound `D` and do not divide it. |
+| 7 | Are the items of All those of Men's? | All 34 pairs of Men's occur among the 80 of All, in the same order; none of Women's does. | An inference from equal pairs. |
 
 ## 1. Interval width and the resampling unit
 
-The registration resamples ten-minute blocks because lists are reused and clicks cluster, so that neither rows nor impressions are independent (Section 5). How much narrower the intervals from rows or impressions are was measured on Men's only (Section 3). Here the two ratios of H3, IPS and SNIPS of the fixed-prior target over the on-policy value, get an interval under three resampling units on every campaign:
-
-- rows, drawn in each log on its own;
-- impressions as Section 7 of the registration defines them, drawn in each log on its own;
-- ten-minute blocks, the registered bootstrap. Its columns reproduce the registered intervals.
-
-Rows and impressions use `numpy.random.default_rng([20261110, 2, c, u, l])` with campaign `c` (all 0, men 1, women 2), unit `u` (rows 0, impressions 1) and log `l` (random 0, BTS 1).
+The registration resamples ten-minute blocks because lists are reused and clicks cluster (Section 5), and measured the narrowing from rows or impressions on Men's only (Section 3). Here the IPS and SNIPS ratios of H3 get an interval under rows, impressions (Section 7 of the registration) and ten-minute blocks, which reproduce the registered intervals, on every campaign. Streams: `units.py`.
 
 | Campaign | Ratio | Estimate | Rows | Impressions | Ten-minute blocks |
 |---|---|---|---|---|---|
@@ -38,13 +44,10 @@ Standard deviation of the replicates:
 | Women's | IPS | 0.0322 | 0.0333 | 0.0467 | 1.45 | 1.40 |
 | Women's | SNIPS | 0.0321 | 0.0331 | 0.0466 | 1.45 | 1.41 |
 
-- On all three campaigns the standard deviation with blocks is 1.31 to 1.47 times the one with rows or impressions.
-- On All and Women's the interval contains 1 under each of the three units. On Men's the intervals from rows and from impressions lie below 1 and the interval from blocks contains 1. The unit decides on which side of 1 the upper end falls only on the development campaign.
+- The standard deviation with blocks is 1.31 to 1.47 times the one with rows or impressions on all three campaigns.
+- On All and Women's the interval contains 1 under each unit. On Men's the intervals from rows and from impressions lie below 1 and the one from blocks contains 1.
 
-The two measures of dependence that Section 3 reports for Men's, on every campaign:
-
-- List reuse: the share of complete impressions that show the same three items in the same order as the complete impression before them, in time order. Under independent uniform draws it would be 0.0002% (All), 0.003% (Men's) and 0.001% (Women's) in the random log.
-- Variance ratio: the variance of the difference in click rate between adjacent time blocks, over the variance that difference would have if impressions were independent. Blocks are paired without overlap. The variance of a block's click rate takes impressions as clusters and carries the factor G / (G - 1) for a block of G impressions. In brackets, the same after subtracting from each click the click rate of its (item, position) in the log. The last column drops the factor.
+The two measures of dependence of Section 3: list reuse, the share of complete impressions that repeat the items and order of the impression before; and the variance ratio of the difference in click rate between adjacent time blocks over its value under independent impressions (brackets: click rate of the (item, position) subtracted; last column: without the factor G / (G - 1)).
 
 | Campaign | Log | Impressions | Complete | Same list as the one before | 1 min | 10 min | 60 min | 1 min, no factor |
 |---|---|---|---|---|---|---|---|---|
@@ -55,10 +58,7 @@ The two measures of dependence that Section 3 reports for Men's, on every campai
 | Women's | random | 280,211 | 268,167 | 0.357 | 1.13 (1.13) | 1.92 (1.89) | 2.07 (2.03) | 1.36 |
 | Women's | BTS | 2,482,614 | 2,177,760 | 0.300 | 1.16 (1.16) | 2.23 (2.22) | 3.33 (3.34) | 1.17 |
 
-- The Men's rows reproduce the list reuse of Section 3 (37% and 31%) and its ratio of 2.0 to 2.5 at ten minutes and more.
-- Section 3 gives 1.2 to 1.5 at one minute. Only the last column reproduces that (1.52 and 1.23). Without the factor the ratio exceeds 1 for independent impressions when blocks hold few of them, as one-minute blocks do. With the factor the one-minute ratio on Men's is 1.18 and 1.20.
-- On All and Women's lists repeat about as often (35% and 36% in the random logs, 30% in the BTS logs). The variance ratio is 1.13 to 1.29 at one minute and 1.85 to 2.23 at ten minutes.
-- No ratio carries an interval. The ratio does not separate dependence between impressions from a click rate that drifts from one block to the next, and drift weighs more in long blocks. The sixty-minute ratios rest on 84 pairs of blocks; the differences among them are not interpreted.
+- The Men's rows reproduce the list reuse of Section 3 (37% and 31%) and its ratio of 2.0 to 2.5 at ten minutes and more. Section 3 gives 1.2 to 1.5 at one minute, which only the last column reproduces (1.52 and 1.23). On All and Women's lists repeat about as often (30% to 36%), and the ratio is 1.13 to 1.29 at one minute and 1.85 to 2.23 at ten.
 
 ## 2. The user feature that amendment 7 left unmatched
 
@@ -73,12 +73,7 @@ Amendment 7 treats two values of a user feature as one if exactly one value occu
 | Women's | 3 | BTS | `f97fde0d` | 1,771,203 | 22.8086% | 1,771,203 |
 | Women's | 3 | BTS | `c9dce82b` | 14 | 0.0002% | 0 |
 
-A row is marked if, in each of the three features that amendment 7 did match, it holds the value that occurs in its log only. There are 485,993 and 4,362,623 marked rows on All and 195,980 and 1,771,203 on Women's: in each log the three matched values sit on the same rows.
-
-- The condition failed because the BTS log holds a second value that the random log lacks: 30 rows on All and 14 on Women's, none of them marked.
-- The other value of each log sits on exactly the marked rows. This is the pattern amendment 7 found in the features it matched.
-
-Taking those two values as one, H7 is recomputed by the registered code on a random log in which the value is written as the BTS log writes it. Every quantity outside H7 comes out as registered.
+A row is marked if it holds, in each of the three features that amendment 7 did match, the value that occurs in its log only; those three values sit on the same rows in each log. The condition failed because the BTS log holds a second value that the random log lacks (30 rows on All, 14 on Women's, none marked); the other value of each log sits on exactly the marked rows. H7 recomputed by the registered code with the two values taken as one, on a random log that writes the value as the BTS log does:
 
 | Quantity | All, registered | All, post hoc | Women's, registered | Women's, post hoc |
 |---|---|---|---|---|
@@ -87,19 +82,12 @@ Taking those two values as one, H7 is recomputed by the registered code on a ran
 | BTS rows whose combination is absent from the random log | 0.3531 (0.3505 to 0.3557) | 0.0001 (0.0001 to 0.0002) | 0.2282 (0.2265 to 0.2302) | 0.0001 (0.0002 to 0.0003) |
 | Change in `rho` under user weights | -0.058 (-0.136 to 0.013) | 0.001 (-0.003 to 0.005) | -0.116 (-0.178 to -0.063) | -0.001 (-0.014 to 0.005) |
 
-- With the value taken as one, the joint distance between the two logs is 0.007 on All and 0.009 on Women's. The registered reference, the same distance between the odd and the even ten-minute blocks of one log, is 0.006 (BTS) and 0.014 (random) on All and 0.006 and 0.015 on Women's.
-- The change in `rho` under user weights is then 0.001 and -0.001, with intervals that contain 0. On Men's, where amendment 7 matched all four features, the registered change is -0.001 (-0.007 to 0.004).
-- An estimate of a distance can lie below its own interval, as in the registered results: a distance between two resampled logs is biased upward.
-- That the two values are one category is an inference from the rows they sit on, as in amendment 7. The files do not state it. The registered H7 numbers stand as registered; these are shown beside them.
+- The joint distance between the two logs is 0.007 on All and 0.009 on Women's, against registered references (odd against even blocks of one log) of 0.006 (BTS) and 0.014 (random) on All and 0.006 and 0.015 on Women's.
+- The change in `rho` under user weights is 0.001 and -0.001, with intervals that contain 0 (registered on Men's, all four features matched: -0.001, -0.007 to 0.004).
 
 ## 3. H2: `M` below 1
 
-On both confirmatory campaigns the mean `M` of `S` over the eligible cells is below 1 (0.973 and 0.967) and H2 is undetermined. Nothing here says why.
-
-`M` at the registered eligibility bound and at two lower ones, with rough sizes of the two biases that Section 8 names:
-
-- Grid bias, upward: to first order, if each recorded propensity is the share of 200,000 Monte Carlo draws. For a cell it is the sum of `(1 - p) / (200,000 p^2)` over its rows, over the rows of its position; the column is its mean over the eligible cells.
-- Low hours, downward. Section 8 names a version that gave a cell a smaller propensity and was never chosen there. While such a version serves, the cell is shown less often than the propensities of its recorded rows imply. The hourly `S` of a cell is its sum of 1/propensity in an hour over the rows of its position in that hour. An hour is low if the hourly `S` is under 0.1 (or 0.5), and it then accounts for its share of the position's rows times (1 - hourly `S`) of the distance of `S` from 1. The columns give the sum over the low hours, averaged over the eligible cells.
+On both confirmatory campaigns the mean `M` of `S` over the eligible cells is below 1 (0.973 and 0.967) and H2 is undetermined. The table gives `M` at the registered eligibility bound and two lower ones, beside the two biases that Section 8 of the registration names: grid bias (upward), if each recorded propensity is the share of 200,000 Monte Carlo draws; and low hours (downward), standing for a version that gave a cell a smaller propensity. An hour is low if the hourly `S` of a cell is under 0.1 (or 0.5). Formulas: `propensities.py`.
 
 | Campaign | Bound | Cells | Share of rows | `M` | Grid bias | Low hours, under 0.1 | Low hours, under 0.5 |
 |---|---|---|---|---|---|---|---|
@@ -113,14 +101,9 @@ On both confirmatory campaigns the mean `M` of `S` over the eligible cells is be
 | Women's | 0.0005 | 22 | 0.434 | 0.978 (0.968 to 0.989) | +0.0005 | 0.030 | 0.049 |
 | Women's | 0.0001 | 99 | 0.912 | 0.956 (0.944 to 0.968) | +0.0030 | 0.134 | 0.176 |
 
-- At the registered bound the grid bias is +0.0002 on every campaign.
-- At the registered bound the low hours account for 0.033 (under 0.1) and 0.039 (under 0.5) on All, where `M` is 0.027 below 1, and for 0.022 and 0.034 on Women's, where `M` is 0.033 below 1. On Men's, where `M` is 1.005, they account for 0.002 and 0.007.
-- Low hours are picked by the value of the statistic itself, so some shortfall is found in any log. Men's shows how much on a campaign whose `M` is not below 1.
-- The logs show that these hours exist and how much of the distance they hold. They do not show what was served in them, so the cause is not identified.
-- With lower bounds `M` does not move one way on the confirmatory campaigns: it is closer to 1 at 0.0005 and further from 1 at 0.0001. At 0.0001 it is below 1, with an interval that excludes 1, on all three campaigns, Men's included.
-- Below the registered bound the low-hour columns stop measuring a bias: at a propensity of 0.0001 a cell is expected to have hours without a row.
+- At the registered bound the grid bias is +0.0002 on every campaign. The low hours account for 0.033 (under 0.1) and 0.039 (under 0.5) on All, where `M` is 0.027 below 1, for 0.022 and 0.034 on Women's, where `M` is 0.033 below 1, and for 0.002 and 0.007 on Men's, where `M` is 1.005. At 0.0005 `M` is closer to 1 and at 0.0001 further from it, below 1 with an interval that excludes 1 on all three campaigns; there the low-hour columns stop measuring a bias, since a cell is expected to have hours without a row.
 
-The eligible cells of the confirmatory campaigns at the registered bound. A low hour here has an hourly `S` under 0.1.
+The eligible cells of the confirmatory campaigns at the registered bound; a low hour has an hourly `S` under 0.1.
 
 | Campaign | Item | Position | Rows | Smallest propensity | `S` | Low hours | Rows there | Rows of the position there | Distance held there |
 |---|---|---|---|---|---|---|---|---|---|
@@ -135,9 +118,8 @@ The eligible cells of the confirmatory campaigns at the registered bound. A low 
 | Women's | 38 | 1 | 127,294 | 0.001285 | 0.973 | 2 | 12 | 48,614 | 0.019 |
 | Women's | 38 | 2 | 150,855 | 0.001290 | 0.959 | 3 | 14 | 67,990 | 0.026 |
 
-- In their low hours the three cells of All have 147 rows among 409,714 rows of their positions, and the seven of Women's have 91 among 397,506. The rows they do have record propensities with a harmonic mean, by cell, of 0.03 to 0.13 (All) and 0.02 to 0.17 (Women's).
-- `S` is below 1 in 2 of the 3 cells of All and in all 7 of Women's. On Men's it is below 1 in 6 of 12 cells and ranges from 0.991 to 1.026.
-- On both confirmatory campaigns the cell whose smallest propensity is closest to the bound has the lowest `S`, and the cell with the most rows the highest. On Men's the cell closest to the bound has the highest `S` of the twelve. Three and seven cells do not establish a relation.
+- In their low hours the three cells of All have 147 rows among 409,714 rows of their positions, and the seven of Women's 91 among 397,506; the rows they do have record propensities with a harmonic mean, by cell, of 0.03 to 0.13 (All) and 0.02 to 0.17 (Women's).
+- `S` is below 1 in 2 of the 3 cells of All and in all 7 of Women's; on Men's in 6 of 12 cells, from 0.991 to 1.026. On both confirmatory campaigns the cell closest to the bound has the lowest `S` and the cell with the most rows the highest; on Men's the cell closest to the bound has the highest `S` of the twelve.
 
 `M` at the registered bound by UTC day, from the blocks of that day:
 
@@ -151,30 +133,15 @@ The eligible cells of the confirmatory campaigns at the registered bound. A low 
 | 29 Nov | 1.006 (0.984 to 1.029) | 0.924 (0.881 to 0.968) | 0.863 (0.816 to 0.908) |
 | 30 Nov | 1.007 (0.989 to 1.026) | 0.982 (0.932 to 1.034) | 1.003 (0.976 to 1.031) |
 
-- At the registered bound `M` is below 1, with an interval that excludes 1, on 27 and 29 November on both confirmatory campaigns, and its interval contains 1 on the other five days. On Men's it contains 1 on every day.
-- Of the distance held by low hours (under 0.1) at the registered bound, 0.031 of 0.033 on All and 0.021 of 0.022 on Women's falls on these two days.
-- The pattern is weaker at the lower bounds (`m_by_day` in `results/propensities.json`). At 0.0005 Women's keeps both days and adds 30 November, while on All 27 November is at 1.000 and the only day whose interval excludes 1 is 25 November. At 0.0001 29 November is the lowest day on All and on Women's, and on Men's the lowest day is 24 November.
-- The days were looked at after the results were known, and 63 daily intervals were computed, 21 of them in the table, without any allowance for their number. The table says where in the week the registered `M` falls short. It does not say why.
+- `M` is below 1, with an interval that excludes 1, on 27 and 29 November on both confirmatory campaigns; its interval contains 1 on the other five days and on every day on Men's. These two days hold 0.031 of the 0.033 of distance held by low hours on All and 0.021 of 0.022 on Women's. At the lower bounds the days differ (`m_by_day` in `results/propensities.json`): at 0.0001 the interval excludes 1 on 5 of 7 days on All and on Women's and on 2 on Men's.
 
 ## 4. Interval width and the block length
 
-The lengths, the random stream and the reading below were committed before this analysis was run; the commit that added them holds no result of it.
+The lengths, the random stream and the reading below were committed before this analysis was run. The registration says the width is the same for blocks of 5 to 60 minutes, measured on Men's only (Sections 3 and 8). Here the two ratios of H3 get an interval with clock blocks of 5, 10, 20, 30, 60 and 180 minutes (2,016, 1,008, 504, 336, 168 and 56 blocks a week) on every campaign and on the pooled unit `0.54 x (All) + 0.46 x (Women's)`. A replicate draws as many blocks as the week holds, with replacement; ten minutes uses the registered multiplicities and the run stops if an interval differs from the registered one; the other lengths use the stream in `blocks.py`.
 
-The registration resamples ten-minute blocks and says that the width of the intervals is the same for blocks of 5 to 60 minutes. That was measured on the fixed-prior ratios of Men's only, with 1,000 replicates of another random stream (Sections 3 and 8). Here the two ratios of H3 get an interval with clock blocks of 5, 10, 20, 30, 60 and 180 minutes as resampling units, on every campaign and on the pooled unit of Section 4 of the registration.
+Reading, fixed beforehand: for each unit, the lengths at which the interval contains 1 and the range of the standard deviation over the one at ten minutes. Lengths that differ by under 2% are not told apart (Monte Carlo error about 0.7%, 1% for a ratio). A rise would point to dependence or change over the week beyond ten minutes.
 
-- A block of `L` minutes is the UTC clock interval of `L` minutes that contains the timestamp, counted from the start of the week. The week holds 2,016, 1,008, 504, 336, 168 and 56 of them.
-- As in the registered bootstrap, a replicate draws as many blocks as the week holds, with replacement, a block carries the rows of both logs that fall in it, and the same blocks are drawn on every campaign. `pi0` stays as computed on the full data. Intervals are 2.5th and 97.5th percentiles of 10,000 replicates.
-- At ten minutes the multiplicities are the registered ones, and the run stops if an interval differs from the registered one. At every other length the multiplicities of replicate `i` are `numpy.random.default_rng([20261110, 3, L, i]).multinomial(n, numpy.full(n, 1 / n))`, with `n` the number of blocks.
-- Reported for each campaign, ratio and length: the interval, the standard deviation of the replicates, and that standard deviation over the one at ten minutes. The pooled unit is `0.54 x (All) + 0.46 x (Women's)`, computed within each replicate.
-
-How it is read:
-
-- It is descriptive. It gives no verdict and changes no registered label.
-- Two things are stated from the table for each unit: the lengths at which the interval contains 1, and the range of the standard deviation over the one at ten minutes.
-- The standard deviation of 10,000 replicates carries a Monte Carlo error of about 0.7% of its value (normal approximation), and the ratio of two of them about 1%. Lengths whose standard deviations differ by under 2% are not told apart.
-- A standard deviation that grows with the length would point to dependence between rows, or to change over the week, that reaches beyond ten minutes. This analysis does not separate the two (Section 8 of the registration). At 180 minutes an interval rests on 56 resampling units.
-
-The numbers below come from one run of commit `7ec1253` (numpy 2.5.3), `python -m obd.posthoc.run blocks`, stored in `results/blocks.json`. The intervals at ten minutes are the registered ones.
+From one run of commit `7ec1253` (numpy 2.5.3), `python -m obd.posthoc.run blocks`, stored in `results/blocks.json`:
 
 | Unit | Ratio | Estimate | 5 min | 10 min | 20 min | 30 min | 60 min | 180 min |
 |---|---|---|---|---|---|---|---|---|
@@ -200,38 +167,17 @@ Standard deviation of the replicates, and in brackets over the one at ten minute
 | Pooled | IPS | 0.0300 (0.97) | 0.0310 (1.00) | 0.0323 (1.04) | 0.0338 (1.09) | 0.0343 (1.10) | 0.0406 (1.31) |
 | Pooled | SNIPS | 0.0298 (0.96) | 0.0310 (1.00) | 0.0324 (1.05) | 0.0335 (1.08) | 0.0342 (1.11) | 0.0408 (1.32) |
 
-- On All, Women's and the pooled unit the interval of each ratio contains 1 at every length.
-- On Men's the SNIPS interval contains 1 at every length. The IPS interval contains 1 at every length but 30 minutes, where its upper end is 0.9997; across the six lengths that upper end lies between 0.9997 and 1.0046.
-- The standard deviation over the one at ten minutes ranges from 0.98 to 1.03 (IPS) and 0.98 to 1.01 (SNIPS) on Men's, 0.95 to 1.13 and 0.95 to 1.14 on All, 0.96 to 1.36 and 0.95 to 1.35 on Women's, and 0.97 to 1.31 and 0.96 to 1.32 on the pooled unit.
-- On Men's no length is more than 3% from ten minutes. For 5 to 60 minutes the standard deviation of the IPS ratio is 0.054 to 0.055; Section 3 of the registration gives 0.052 to 0.054.
-- On All, Women's and the pooled unit the standard deviation is smaller at 5 minutes than at ten and larger at every longer length: 0.95 to 0.97 of the one at ten minutes at 5 minutes, 1.07 to 1.12 at 60 minutes and 1.13 to 1.36 at 180 minutes. Each of these differs from ten minutes by more than the 2% fixed above; the smallest difference is 2.1% (All, IPS, 20 minutes). Between neighbouring lengths the step from 30 to 60 minutes is under 2% on All (IPS, 1.44%), All (SNIPS, 1.95%), the pooled unit (IPS, 1.34%), and by that rule those two lengths are not told apart there.
-- The registration measured on Men's a width that does not depend on the block length. That is reproduced on Men's. It is not what the estimates on the confirmatory campaigns show, and whether their rise exceeds sampling error is not tested here.
-- As fixed above, a rise points to dependence between rows, or to change over the week, that reaches beyond ten minutes, and the two are not separated. With longer blocks the intervals of the confirmatory units are wider than at ten minutes and still contain 1: the pooled IPS interval is 0.915 to 1.036 at ten minutes, 0.909 to 1.042 at 60 minutes and 0.897 to 1.056 at 180 minutes.
-- Not fixed beforehand: a standard deviation estimated from `n` blocks has a sampling error of its own, roughly `1 / sqrt(2 (n - 1))` of its value under a normal approximation: 3.2% at 504 blocks, 3.9% at 336, 5.5% at 168 and 9.5% at 56. The estimates at different lengths come from the same rows, so these errors are not independent, and no interval is given for a ratio between lengths. On All the ratios from 5 to 60 minutes run from 0.95 to 1.07, on Women's from 0.95 to 1.12.
-- The registered intervals and labels stand as registered.
+- On All, Women's and the pooled unit every interval contains 1. On Men's the SNIPS interval does; the IPS upper end is 0.9997 to 1.0046 across the six lengths, within Monte Carlo error of 1.
+- On Men's no length is more than 3% from ten minutes, and the standard deviation of the IPS ratio is 0.054 to 0.055 for 5 to 60 minutes where the registration gives 0.052 to 0.054: the registered width independence is reproduced there, and is not what the estimates on the confirmatory units show.
+- On All, Women's and the pooled unit the standard deviation is 0.95 to 0.97 of the ten-minute one at 5 minutes, 1.07 to 1.12 at 60 and 1.13 to 1.36 at 180. Each differs from ten minutes by more than 2%, except that 30 and 60 minutes are not told apart on All (IPS 1.44%, SNIPS 1.95%) and the pooled unit (IPS 1.34%). The intervals widen and still contain 1: pooled IPS 0.915 to 1.036 at ten minutes, 0.897 to 1.056 at 180.
 
 ## 5. The other registered intervals and the block length
 
-The quantities, the random stream and the reading below were committed before this analysis was run; the commit that added them holds no result of it.
+The quantities, the random stream and the reading below were committed before this analysis was run. Two registered labels rest on intervals that end close to the value the rule compares them with: the pooled alignment label of H4, "raises the estimate", with a lower end of `d` at 0.002, and the SNIPS label of H6, "consistent", with half-widths of 0.097 (All) and 0.098 (Women's) against 0.10. Here the intervals behind H4, H5 and H6 use the blocks and replicates of Section 4: `rho` and `d` of H4 at three hours, for every campaign and the pooled unit; the difference (iii) minus (ii) of H5; the IPS and SNIPS ratios of H6.
 
-Section 4 varies the block length for the two ratios of H3 only. Two registered labels rest on intervals that end close to the value the rule compares them with: the pooled alignment label of H4, "raises the estimate", with a lower end of `d` at 0.002, and the SNIPS label of H6, "consistent", with half-widths of 0.097 (All) and 0.098 (Women's) against the bound of 0.10. Here the intervals behind the labels of H4, H5 and H6 are computed with the block lengths of Section 4.
+Reading, fixed beforehand: at another length than ten minutes the report says where the interval lies and gives no label. An end of a percentile interval has a Monte Carlo standard error of about 0.027 times the standard deviation of the replicates, a half-width about 0.019 times; an end within two errors of the value it is compared with is reported as at that value.
 
-- Quantities, as the registration defines them: `rho` and `d` of H4 at the width used (three hours on every campaign); the difference (iii) minus (ii) of H5; the IPS and SNIPS ratios of H6. `rho` and `d` are given for every campaign and for the pooled unit, `0.54 x (All) + 0.46 x (Women's)` within each replicate; H5 and H6 have no pooled unit.
-- Blocks, replicates and multiplicities are those of Section 4, so a replicate at a given length draws the same blocks here as there. `pi0` and the width of H4 stay as fixed on the full data; counts, coverage, fallback, windows and the on-policy value are recomputed in every replicate. Intervals are 2.5th and 97.5th percentiles of the replicates in which a quantity is defined.
-- The run stops if an interval at ten minutes differs from the registered one, or if the interval of the IPS ratio of H3, which enters `d`, differs at any length from the one in `results/blocks.json`.
-- Reported for each unit, quantity and length: the interval, the standard deviation of the replicates and that standard deviation over the one at ten minutes; for H6 also the half-width of the interval.
-
-How it is read:
-
-- It is descriptive. The registered rules are defined for ten-minute blocks; at another length the report says where the interval lies and gives no label. The registered labels stand.
-- Stated for each unit: the lengths at which the interval of `d` lies above 0, at which that of `rho` contains 1, at which that of the H5 difference lies above 0, and at which that of an H6 ratio contains 1 and has a half-width of at most 0.10.
-- An end of a percentile interval of 10,000 replicates carries a Monte Carlo standard error of about 0.027 times the standard deviation of the replicates, and a half-width about 0.019 times (normal approximation). An end less than two such errors from the value it is compared with, or a half-width less than two of its errors from 0.10, is reported as at that value and counted on neither side.
-- The standard deviations are read as in Section 4: lengths whose standard deviations differ by under 2% are not told apart, a rise with the length points to dependence between rows or to change over the week beyond ten minutes, and the two are not separated. At 180 minutes an interval rests on 56 resampling units.
-- Twelve intervals per length are compared with a value on the confirmatory units, five on each campaign and two on the pooled unit, at five lengths besides the registered one, without any allowance for their number.
-
-The numbers below come from one run of commit `c5eb6c5` (numpy 2.5.3), `python -m obd.posthoc.run lengths distances`, stored in `results/lengths.json`. Both checks passed, and no replicate left a quantity undefined.
-
-`d` and `rho` of H4 at three hours:
+From one run of commit `c5eb6c5` (numpy 2.5.3), `python -m obd.posthoc.run lengths distances`, stored in `results/lengths.json`; both checks passed and no replicate left a quantity undefined. `d` and `rho` of H4 at three hours:
 
 | Unit | Quantity | 5 min | 10 min | 20 min | 30 min | 60 min | 180 min |
 |---|---|---|---|---|---|---|---|
@@ -273,64 +219,27 @@ The ends that lie close to the value they are compared with, to four decimals, a
 | All | half-width of H6 SNIPS, against 0.10 | 0.0927; 8.3 | 0.0974; 2.8 | 0.0977; 2.5 | 0.0995; 0.6 | 0.0985; 1.6 | 0.0938; 7.0 |
 | Women's | half-width of H6 SNIPS, against 0.10 | 0.0957; 4.7 | 0.0976; 2.6 | 0.1015; -1.6 | 0.1004; -0.4 | 0.0998; 0.2 | 0.0959; 4.5 |
 
-Standard deviation of the replicates, and in brackets over the one at ten minutes:
-
-| Unit | Quantity | 5 min | 10 min | 20 min | 30 min | 60 min | 180 min |
-|---|---|---|---|---|---|---|---|
-| Men's | `d` | 0.0535 (1.04) | 0.0513 (1.00) | 0.0528 (1.03) | 0.0584 (1.14) | 0.0538 (1.05) | 0.0713 (1.39) |
-| Men's | `rho` | 0.0661 (0.99) | 0.0668 (1.00) | 0.0663 (0.99) | 0.0701 (1.05) | 0.0714 (1.07) | 0.0881 (1.32) |
-| Men's | H5 | 0.0345 (0.93) | 0.0371 (1.00) | 0.0404 (1.09) | 0.0487 (1.31) | 0.0750 (2.02) | 0.0469 (1.26) |
-| Men's | H6 IPS | 0.0421 (0.96) | 0.0439 (1.00) | 0.0445 (1.01) | 0.0469 (1.07) | 0.0455 (1.04) | 0.0481 (1.10) |
-| Men's | H6 SNIPS | 0.0951 (1.00) | 0.0949 (1.00) | 0.0951 (1.00) | 0.0979 (1.03) | 0.0992 (1.05) | 0.1002 (1.06) |
-| All | `d` | 0.0508 (0.98) | 0.0517 (1.00) | 0.0558 (1.08) | 0.0569 (1.10) | 0.0532 (1.03) | 0.0436 (0.84) |
-| All | `rho` | 0.0511 (1.02) | 0.0503 (1.00) | 0.0525 (1.04) | 0.0558 (1.11) | 0.0539 (1.07) | 0.0486 (0.97) |
-| All | H5 | 0.0333 (0.98) | 0.0341 (1.00) | 0.0367 (1.08) | 0.0432 (1.27) | 0.0611 (1.79) | 0.0368 (1.08) |
-| All | H6 IPS | 0.0377 (0.96) | 0.0392 (1.00) | 0.0393 (1.00) | 0.0412 (1.05) | 0.0401 (1.02) | 0.0377 (0.96) |
-| All | H6 SNIPS | 0.0470 (0.95) | 0.0494 (1.00) | 0.0497 (1.00) | 0.0509 (1.03) | 0.0502 (1.02) | 0.0480 (0.97) |
-| Women's | `d` | 0.0447 (0.98) | 0.0455 (1.00) | 0.0479 (1.05) | 0.0473 (1.04) | 0.0519 (1.14) | 0.0456 (1.00) |
-| Women's | `rho` | 0.0453 (0.96) | 0.0471 (1.00) | 0.0503 (1.07) | 0.0530 (1.13) | 0.0584 (1.24) | 0.0559 (1.19) |
-| Women's | H5 | 0.0262 (0.94) | 0.0278 (1.00) | 0.0319 (1.15) | 0.0391 (1.41) | 0.0594 (2.14) | 0.0369 (1.33) |
-| Women's | H6 IPS | 0.0303 (0.97) | 0.0312 (1.00) | 0.0335 (1.07) | 0.0319 (1.02) | 0.0351 (1.12) | 0.0366 (1.17) |
-| Women's | H6 SNIPS | 0.0490 (0.97) | 0.0504 (1.00) | 0.0515 (1.02) | 0.0511 (1.01) | 0.0508 (1.01) | 0.0493 (0.98) |
-| Pooled | `d` | 0.0343 (0.98) | 0.0349 (1.00) | 0.0367 (1.05) | 0.0380 (1.09) | 0.0370 (1.06) | 0.0330 (0.95) |
-| Pooled | `rho` | 0.0348 (1.00) | 0.0348 (1.00) | 0.0359 (1.03) | 0.0387 (1.11) | 0.0394 (1.13) | 0.0365 (1.05) |
-
-- `rho`: the interval contains 1 in every unit at every length.
-- `d` on the campaigns: the interval contains 0 on All and on Women's at every length. On Men's it contains 0 at every length but 5 minutes, where its lower end, -0.0025, is at 0.
-- `d` on the pooled unit: the lower end lies between 0.0011 and 0.0040 at the six lengths. It lies above 0 at 5, 10 and 180 minutes, by 3.3, 2.1 and 4.6 errors, and at 0 at 20, 30 and 60 minutes (1.5, 1.5 and 1.1 errors). At no length does the interval reach below 0.
-- H5: on All the interval lies above 0 at every length but 60 minutes, where it is -0.022 to 0.220. On Women's it lies above 0 at 5, 10 and 20 minutes; at 30 minutes its lower end, -0.0012, is at 0; at 60 and 180 minutes it contains 0 (-0.039 to 0.196 and -0.005 to 0.140). On Men's it lies above 0 at every length.
-- H6, IPS: on All and Women's the interval contains 1 at every length and its half-width is 0.059 to 0.081.
-- H6, SNIPS: on All and Women's the interval contains 1 at every length. Its half-width is 0.0927 to 0.1015. It is below 0.10 at 5, 10 and 180 minutes on both campaigns and at 20 minutes on All. It is at 0.10 at 30 and 60 minutes on All and at 20, 30 and 60 minutes on Women's; at 20 and 30 minutes on Women's the number itself is above 0.10 (0.1015 and 0.1004). On Men's, where the registered label is "undetermined", the half-width is 0.178 to 0.189.
-- Standard deviation over the one at ten minutes: 1.00 to 1.13 for `rho` and 0.95 to 1.09 for `d` on the pooled unit; 0.97 to 1.11 and 0.84 to 1.10 on All; 0.96 to 1.24 and 0.98 to 1.14 on Women's. For the H6 ratios it is 0.95 to 1.05 on All and 0.97 to 1.17 on Women's. It does not rise with the length throughout: at 180 minutes it is below the ten-minute value for `d` on All and on the pooled unit and for `rho` on All. As fixed above, differences between lengths are not attributed.
-- For the H5 difference the standard deviation is largest at 60 minutes on every campaign, 1.79 (All), 2.14 (Women's) and 2.02 (Men's) times the one at ten minutes, and smaller again at 180 minutes (1.08, 1.33, 1.26).
-- Not fixed beforehand: the reading above did not foresee that a block length can interfere with the construction of an estimate. H5 takes its target from the clock hour before and the clock hour after a row and uses only rows that have both. A clock hour is missing from a replicate with probability 0.0024 at ten minutes and 0.05, 0.13 and 0.37 at 20, 30 and 60 minutes, and with 60-minute blocks a replicate holds both neighbours of a given hour with probability 0.40. These figures follow from the multinomial draw and from no data. From 20 to 60 minutes the H5 intervals therefore rest on fewer and fewer rows. At 180 minutes a block is three hours and is missing from a replicate with probability 0.36; two of its three hours have a neighbour in another block. How many rows the replicates leave out was not recorded, so the part of the widening that this accounts for is not known, and the widening is read neither as a sign of dependence nor as explained by this remark. On Men's the interval lies above 0 at 60 minutes under the same construction.
-- For the two registered labels named at the start of this section, by the reading fixed above: the pooled lower end of `d` lies above 0 at three of the six lengths and at 0 at three, and the SNIPS half-width lies below 0.10 at seven of the twelve combinations of campaign and length and at 0.10 at five. In no case does an end lie on the other side of its value by that reading.
-- The registered intervals and labels stand as registered.
+- `rho`: the interval contains 1 in every unit at every length. `d` on the campaigns contains 0 on All and Women's at every length, and on Men's at every length but 5 minutes, where its lower end, -0.0025, is at 0.
+- `d` on the pooled unit: the lower end lies above 0 at 5, 10 and 180 minutes (by 3.3, 2.1 and 4.6 Monte Carlo errors) and at 0 at 20, 30 and 60 minutes (1.5, 1.5 and 1.1 errors); at no length does the interval reach below 0.
+- H5: on All the interval lies above 0 at every length but 60 minutes (-0.022 to 0.220). On Women's it lies above 0 at 5, 10 and 20 minutes, is at 0 at 30 (lower end -0.0012) and contains 0 at 60 and 180. On Men's it lies above 0 at every length.
+- H6: the intervals of both ratios contain 1 at every length on All and Women's. The SNIPS half-width is 0.0927 to 0.1015: below 0.10 at 5, 10 and 180 minutes on both campaigns and at 20 on All, and at 0.10 at the other lengths (on Women's 0.1015 at 20 minutes and 0.1004 at 30 lie within two errors of it).
+- For the two registered labels: the pooled lower end of `d` is above 0 at three of six lengths and at 0 at three; the SNIPS half-width is below 0.10 in seven of twelve combinations of campaign and length and at 0.10 in five. No end lies on the other side.
+- The standard deviation over the one at ten minutes (`results/lengths.json`) is largest for H5 at 60 minutes on every campaign (1.79 on All, 2.14 on Women's, 2.02 on Men's), 1.24 for `rho` on Women's at 60 minutes and 1.39 for `d` on Men's at 180 minutes.
+- Not fixed beforehand: H5 takes its target from the clock hour before and the one after a row and uses only rows that have both. A clock hour is missing from a replicate with probability 0.0024 at ten minutes and 0.05, 0.13 and 0.37 at 20, 30 and 60 minutes (0.36 for a three-hour block at 180), and with 60-minute blocks a replicate holds both neighbours of a given hour with probability 0.40 (multinomial draw). From 20 to 60 minutes the H5 intervals therefore rest on fewer rows.
 
 ## 6. Three distances that read no click
 
-The quantities and the reading below were committed before this analysis was run; the commit that added them holds no result of it.
-
-H1 finds the published prior "inconsistent" with the hourly frequencies of the BTS log: `D` is 0.526 (All) and 0.527 (Women's) against a noise floor `D0` of 0.136 and 0.115. The label does not say whether the log shows one fixed distribution that is not the prior's, or a distribution that changed during the week. Three further distances are computed from the item, position and timestamp columns of the BTS log and from `pi0`. TV, `f_h`, `N_B` and the weights are those of H1; `f(a|k) = N_B(a,k)/N_B(k)` are the frequencies of the whole week.
+The quantities and the reading below were committed before this analysis was run. H1 finds the published prior "inconsistent" with the hourly frequencies of the BTS log: `D` is 0.526 (All) and 0.527 (Women's) against a noise floor `D0` of 0.136 and 0.115. The label does not say whether the log shows one fixed distribution that is not the prior's, or one that changed during the week. Three further distances use the item, position and timestamp columns of the BTS log and `pi0`, with the TV, `f_h`, `N_B` and weights of H1 and `f(a|k) = N_B(a,k)/N_B(k)` the whole-week frequencies:
 
 - `A`, the prior against the whole week: `sum over k of [N_B(k)/N_B] x TV(f(.|k), pi0(.|k))`. Its reference, since a distance is positive by construction: the same sum between the whole-week frequencies of the rows in the first, third and fifth ten-minute block of every hour and those of the other rows.
 - `E`, the hours against the whole week: `sum over (h, k) of [N_B(h,k)/N_B] x TV(f_h(.|k), f(.|k))`, over the `(h, k)` that enter `D`.
-- The first hour of the week, by position: the registered distance `TV(f_0(.|k), pi0(.|k))` and its own floor, the distance between the frequencies of the rows of that hour in its first, third and fifth block and in its other blocks, with the number of rows.
-- `D` and `D0` are recomputed, and the run stops if they differ from the registered values.
-- The same quantities for the random log with the uniform distribution in place of `pi0`: a case in which the policy is fixed and known.
+- The first hour of the week, by position: the registered distance `TV(f_0(.|k), pi0(.|k))` and its floor, the distance between the frequencies of that hour's rows in its first, third and fifth block and in its other blocks.
 
-Two relations hold by construction when no `(h, k)` is left out. `A <= D`, because the whole-week frequencies are the row-weighted mean of the hourly ones and TV is convex. `D <= A + E`, by the triangle inequality.
+`D` and `D0` are recomputed (the run stops if they differ from the registered values), and the same quantities are computed for the random log with the uniform distribution in place of `pi0`, where the policy is fixed and known. By construction `A <= D` (TV is convex and the whole-week frequencies are the row-weighted mean of the hourly ones) and `D <= A + E` (triangle inequality), when no `(h, k)` is left out.
 
-How it is read:
+Reading, fixed beforehand: no interval is computed, as for `D` and `D0` in the registration. If the BTS log showed one fixed distribution all week, `E` and `D - A` would hold noise only, at most `D0` in expectation (about half of it when counts are large). Both are set against the two thresholds of the registered rule of H1: at most `D0`, "not distinguishable from variation within the hour"; above `2 x D0` and above 0.10, more than the rule asks for a difference; otherwise nothing is said. Positions of the first hour are set against their floor and twice their floor.
 
-- It is descriptive and gives no verdict. No interval is computed, as for `D` and `D0` in the registration. The registered label of H1 stands.
-- The noise reference is `D0`. If the policy is fixed within an hour and the two halves of the hour are independent, the expected distance between an hour's frequencies and the distribution of its policy is at most the expected distance between the halves, and about half of it when counts are large. In the registered results the random log, whose policy is fixed and uniform, has a `D` of 0.53 to 0.55 times its `D0`.
-- If the BTS log showed one fixed distribution all week, `E` would hold noise only, and `D - A` would be at most that noise. `E` and `D - A` are therefore set against the two thresholds of the registered rule of H1: at most `D0`, "not distinguishable from variation within the hour"; above `2 x D0` and above 0.10, more than the rule asks for a difference; otherwise between the two, and nothing is said.
-- What is stated from the numbers: `A` with its reference; on which side of the two thresholds `E` falls, which says whether the distribution shown changed between hours; on which side `D - A` falls, which says whether that change adds to the distance from the prior beyond what the whole week's distribution already holds; and for each position of the first hour, on which side of its floor and of twice its floor the distance falls. The first hour is one hour and its floor one split.
-- TV distances do not add. `A` and `E` bound `D` from both sides; they do not divide it into a part due to a fixed difference and a part due to change. If `E` lies above the upper threshold and `D - A` does not, that is what is reported, and the question how much of `D` is change stays open.
-- The distances describe what the log shows. A distribution that changes between hours can come from updated parameters or from servers that hold different versions of them (Section 8 of the registration), and change within an hour is part of `D0`, not of `E`.
-
-The numbers below come from the same run (`results/distances.json`). `D`, `D0` and the first-hour distances reproduce the registered values, and no `(h, k)` is left out.
+From the same run (`results/distances.json`); `D`, `D0` and the first-hour distances reproduce the registered values, and no `(h, k)` is left out:
 
 | Campaign | Log | `D` | `D0` | `A` | Reference of `A` | `E` | `D - A` | `E` over `D0` | `D - A` over `D0` |
 |---|---|---|---|---|---|---|---|---|---|
@@ -364,31 +273,30 @@ The first hour of the week:
 | Women's | random | 2 | 1,774 | 0.194 | 0.262 | 0.74 |
 | Women's | random | 3 | 1,774 | 0.158 | 0.331 | 0.48 |
 
-- `A` is 0.386 on All and 0.413 on Women's, against references of 0.012 and 0.010. The reading fixed no threshold for `A`. On Men's `A` is 0.310 against 0.010.
-- `E` is 0.410 on All and 0.394 on Women's, 3.0 and 3.4 times `D0`. On both it lies above `2 x D0` and above 0.10, the upper threshold: the distribution that the BTS log shows changed between hours. On Men's `E` is 0.335, 3.1 times `D0`.
-- `D - A` is 0.141 on All, 0.115 on Women's and 0.127 on Men's. On each campaign it lies between `D0` and `2 x D0` (on Women's it exceeds `D0` by 0.0001), so nothing is said on whether the change between hours adds to the distance from the prior beyond what the whole week's frequencies already hold.
-- `A` and `E` are 0.73 and 0.78 of `D` on All and 0.78 and 0.75 on Women's. As fixed above, they bound `D` and do not divide it: how much of `D` is a difference that holds all week and how much is change between hours stays open.
-- The random log, whose policy is fixed and uniform: `E` is 0.52 to 0.55 of `D0` and `D - A` 0.48 to 0.50 of it, both under the lower threshold, and `A` (0.013 to 0.018) is below its reference (0.027 to 0.029).
-- The first hour, BTS log. At position 1 the distance from the prior lies between the floor and twice the floor on every campaign (1.30, 1.42 and 1.21 times the floor on All, Women's and Men's). At position 2 it is at most the floor on every campaign (0.83, 0.83, 0.89). At position 3 it is at most the floor on All and Men's (0.59, 0.66) and between on Women's (1.06). In no cell does it exceed twice the floor. In the random log the first-hour distance from the uniform distribution is 0.38 to 0.74 of its floor.
-- Not fixed beforehand: every first-hour distance, taken by position, is smaller than `A`, which is an average over positions.
-- At five of the nine positions the first-hour distance is at most its floor, the threshold under which the registered rule says "not distinguishable from variation within the hour"; at the other four it lies between the two thresholds. This is not a finding that the prior was in force in that hour: it is one hour with one split, and its floor contains whatever change the policy made within the hour.
-- The registered label of H1 stands. What these distances add, without an interval and by the thresholds above: the hourly frequencies of the BTS log differ from those of the whole week, and `A` is 32 (All) and 40 (Women's) times its reference, for which no threshold was fixed. How much of `D` is change is not determined.
+- `A` is 0.386 on All and 0.413 on Women's against references of 0.012 and 0.010 (32 and 40 times), and 0.310 on Men's against 0.010. The reading fixed no threshold for `A`.
+- `E` is 0.410 on All and 0.394 on Women's, 3.0 and 3.4 times `D0`, above `2 x D0` and above 0.10, which the rule reads as a change between hours of the distribution that the BTS log shows. On Men's it is 0.335, 3.1 times `D0`.
+- `D - A` is 0.141 on All, 0.115 on Women's and 0.127 on Men's, between `D0` and `2 x D0` on each, so nothing is said on whether the change between hours adds to the distance from the prior beyond what the whole week's frequencies hold.
+- `A` and `E` are 0.73 and 0.78 of `D` on All and 0.78 and 0.75 on Women's; they bound `D` and do not divide it, because TV distances do not add.
+- The random log, whose policy is fixed and uniform: `E` is 0.52 to 0.55 of `D0` and `D - A` 0.48 to 0.50 of it, and `A` (0.013 to 0.018) is below its reference (0.027 to 0.029).
+- The first hour, BTS log. At position 1 the distance from the prior lies between the floor and twice the floor on every campaign (1.30, 1.42 and 1.21 times the floor on All, Women's and Men's); at position 2 it is at most the floor (0.83, 0.83, 0.89); at position 3 it is at most the floor on All and Men's (0.59, 0.66) and between on Women's (1.06). It never exceeds twice the floor; in the random log it is 0.38 to 0.74 of its floor.
+- Not fixed beforehand: in the BTS log every first-hour distance is smaller than `A`, an average over positions.
 
 ## 7. Parameter pairs of the prior file
 
-This check was first made after the confirmatory results were known, and its outcome was known when this text was written. It is recorded here so that the statement has a source in this repository that can be rerun; the text was committed before the code and the result file.
-
-Section 8 of the registration says that All has as many items as Men's and Women's together (80 = 34 + 46) and that whether they are the same items cannot be told from the data. The prior file gives each campaign a list of pairs of Beta parameters, one pair per item. The check reads that file and nothing else. It counts, for each ordered pair of campaigns, how many parameter pairs of the first occur among those of the second, and it reports whether the pairs of a campaign are all distinct and whether shared pairs stand in the same order in both lists.
-
-- Equal parameter pairs do not identify items: the file holds no item identifier that is common to the campaigns. That campaigns share items is an inference from pairs that occur in both.
-- It is descriptive, gives no verdict and changes nothing in the registration.
-
-From one run of commit `b4fb712`, `python -m obd.posthoc.run prior`, stored in `results/prior.json`:
+Section 8 of the registration says that All has as many items as Men's and Women's together (80 = 34 + 46) and that whether they are the same items cannot be told from the data. The prior file gives each campaign a list of pairs of Beta parameters, one pair per item. This check reads that file only. It counts, for each ordered pair of campaigns, the parameter pairs of the first that occur among those of the second, and whether pairs are distinct and in the same order. Its outcome was known when this text was written; the text was committed before the code and the result file. From one run of commit `b4fb712`, `python -m obd.posthoc.run prior`, stored in `results/prior.json`:
 
 - The file gives 80 pairs to All, 34 to Men's and 46 to Women's, and the pairs of each campaign are all distinct.
-- All 34 pairs of Men's occur among those of All, in the same order.
-- None of the pairs of Women's occurs among those of All or of Men's.
-- By the inference named above, All is not a clean hold-out from Men's, the development campaign. Women's shares no pair with Men's.
+- All 34 pairs of Men's occur among those of All, in the same order. None of the pairs of Women's occurs among those of All or of Men's.
+- By the inference named in the Limits, All is not a clean hold-out from Men's, the development campaign.
+
+## Limits
+
+- Section 1. No variance ratio carries an interval. The ratio does not separate dependence between impressions from a click rate that drifts from one block to the next, and drift weighs more in long blocks. The sixty-minute ratios rest on 84 pairs of blocks and are not interpreted, although 2.61 and 3.33 in the BTS logs of All and Women's lie above the 2.0 to 2.5 of Men's.
+- Sections 2 and 7. That the two values of Section 2 are one category, and that campaigns share items in Section 7, are inferences; the files state neither, and the prior file holds no item identifier common to the campaigns. An estimate of a distance can lie below its own interval (0.0068 against 0.0082 to 0.0106 in Section 2), because a distance between two resampled logs is biased upward.
+- Section 3. Low hours are picked by the statistic itself, so selection alone produces some shortfall; Men's, where `M` is 1.005, shows 0.002 and 0.007. The logs do not show what was served in those hours, so the cause is not identified. The days were looked at after the results were known; 63 daily intervals were computed, 21 in the table, without allowance. Three and seven cells do not establish a relation between a cell's smallest propensity and its `S`.
+- Section 4. A standard deviation estimated from `n` blocks has a sampling error of roughly `1 / sqrt(2 (n - 1))` of its value under a normal approximation: 3.2% at 504 blocks, 3.9% at 336, 5.5% at 168, 9.5% at 56. The estimates at different lengths share their rows, so no ratio between lengths has an interval. Whether the rise with the length exceeds sampling error is not tested, and a rise does not separate dependence beyond ten minutes from change over the week.
+- Section 5. Twelve intervals per length are compared with a value on the confirmatory units, at five lengths besides the registered one, without allowance. How many rows the replicates leave out of H5 was not recorded, so its widening at long blocks is read neither as dependence nor as explained by the missing neighbour hours.
+- Section 6. The first hour is one hour with one split, and its floor contains whatever change the policy made within the hour, so its distances are no finding that the prior was in force then. A change between hours can come from updated parameters or from servers with different versions of them (Section 8 of the registration). How much of `D` is change stays open.
 
 ## Code
 
