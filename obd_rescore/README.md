@@ -105,7 +105,7 @@ On Men's, `R_SNIPS / V_on` is 0.770 (0.685 to 0.862) with the published target o
 
 - The stop checks of the six logs ([`results/checks.json`](results/checks.json)) found the registered row counts, items, positions and week, and stopped nothing.
 - `R_IPS` and `R_SNIPS` differ from the IPS and SNIPS that BLUE returns on the full data by at most a relative 1.9e-15 (`references.json`, `stop_check_relative_differences`); the run stops above 1e-9.
-- Before writing any label the run checks that obp read every row of each random log, that the rows of every block run and replicate are those of the drawn blocks, and that runs 0 to 149 of the main run repeat the replication; it stops otherwise (`run.py`).
+- Before writing any label the run checks that obp read every row of each random log, that every block run and replicate holds as many rows as its drawn blocks do, and that runs 0 to 149 of the main run repeat the replication; it stops otherwise (`run.py`).
 - pandas 3.1.1 uses one converter for every `float_precision` mode. The logs are read with `"round_trip"` as registered, and a check at the start of the run found no value among 2.1 million decimal strings that any of three modes parses differently from Python's `float()` (`provenance.json`, `study.float_parsing`).
 
 ## Reading
@@ -131,5 +131,6 @@ The run downloads the dataset archive (413 MB) and verifies its SHA-256. With fo
 - In C2 the reward model is fitted once on the full data, and replicates do not include the variation of its fit.
 - Intervals and block runs rest on ten-minute blocks.
 - All's prior holds all 34 parameter pairs of Men's in the same order, so, by the inference of Section 7 of `obd/posthoc/`, All is not independent of Men's.
+- Section 9 of the registration says that a resumed run must reproduce what it had written. A resumed process recomputes only the last line of each record and stops if it differs from the stored line (`adapters/common.py`); a line before it that changed between a stop and the resumption would pass this check. The registered run was not resumed (`results/provenance.json`, `events`: one `start`, no `stopped`). Added on 2026-11-22, after the results, which are unchanged.
 
-Section 10 of the registration gives every limit.
+Section 10 of the registration gives every limit but the last.
