@@ -80,28 +80,63 @@ action = k * n_items + a  # as pre_process numbers the logged action
 n = len(action)
 out = {}
 for target in ("published", "own"):
-    pi_e, pi_b = mips.layouts(pi, n, target)
-    ips = InverseProbabilityWeighting()._estimate_round_rewards(
+    pi_e, _ = mips.layouts(pi, n, target)
+    out[target] = InverseProbabilityWeighting()._estimate_round_rewards(
         reward=np.ones(n), action=action, position=np.zeros(n, int),
-        pscore=np.full(n, 1 / n_items) / 3, action_dist=pi_e)
-    w_x_a = pi_e[:, :, 0] / pi_b[:, :, 0]  # ope.py line 65
-    out[target] = {"ips": ips.tolist(), "mips": w_x_a[np.arange(n), action].tolist()}
+        pscore=np.full(n, 1 / n_items) / 3, action_dist=pi_e).tolist()
 print(json.dumps(out))
 """
 
 
 @pytest.mark.parametrize("n_items", ITEMS.values())
-def test_t2_each_pair_is_weighted_by_its_layout(n_items):
+def test_t2_ips_weights_each_pair_by_its_layout(n_items):
     pi = np.random.default_rng(n_items).dirichlet(np.ones(n_items), 3).T
     weights = json.loads(run("mips", WEIGHTS, envs.ADAPTERS, json.dumps(pi.tolist())))
     a, k = (x.ravel() for x in np.meshgrid(np.arange(n_items), np.arange(3), indexing="ij"))
     j = k * n_items + a
     expected = {"published": n_items * pi[j // 3, j % 3], "own": n_items * pi[a, k]}
     for target in ("published", "own"):
-        for name in ("ips", "mips"):
-            np.testing.assert_allclose(weights[target][name], expected[target], rtol=1e-12)
-    same = np.isclose(weights["published"]["ips"], weights["own"]["ips"], rtol=1e-12)
+        np.testing.assert_allclose(weights[target], expected[target], rtol=1e-12)
+    same = np.isclose(weights["published"], weights["own"], rtol=1e-12)
     assert sorted(zip(a[same], k[same], strict=True)) == [(0, 0), (n_items - 1, 2)]
+
+
+PUBLISHED_MIPS = """
+import json, sys
+import numpy as np
+sys.path.insert(0, sys.argv[1])
+import mips
+published, ope = mips.published_code(sys.argv[2])
+dataset = published.ModifiedOpenBanditDataset(
+    behavior_policy="random", data_path=sys.argv[3], campaign=sys.argv[4])
+feedback = dataset.obtain_batch_bandit_feedback()
+pi = np.load(sys.argv[5])[0]
+n, n_items = feedback["n_rounds"], len(pi)
+j = np.arange(3 * n_items)  # the logged action of item a at position k is k n_A + a
+layout = {"published": pi[j // 3, j % 3], "own": pi[j % n_items, j // n_items]}
+uniform = np.full((n, 3 * n_items, 1), 1 / n_items / 3)
+out = {}
+for target, pi_star in layout.items():
+    direct = {name: float(ope.MIPS().estimate_policy_value(
+        context=feedback["context"], reward=feedback["reward"], action=feedback["action"],
+        action_emb=feedback["action_context"], action_dist_b=uniform,
+        action_dist_e=np.tile(pi_star[:, None] / 3, (n, 1, 1)),
+        n_actions=feedback["n_actions"], feature_pruning=pruning))
+        for name, pruning in [("mips", "no"), ("mips_slope", "exact")]}
+    adapter = mips.estimates(ope, feedback, pi, target, list(direct))
+    out[target] = {"adapter": adapter, "direct": direct}
+print(json.dumps(out))
+"""
+
+
+@pytest.mark.parametrize("campaign", ITEMS)
+def test_t2_the_published_mips_is_given_the_layout_of_each_target(campaign, extracted, inputs):
+    args = [envs.ADAPTERS, SOURCES["mips"], extracted, campaign, inputs[campaign][0]]
+    out = json.loads(run("mips", PUBLISHED_MIPS, *args))
+    for target in ("published", "own"):
+        assert out[target]["adapter"] == out[target]["direct"]
+    for name in ("mips", "mips_slope"):  # the two layouts are told apart
+        assert out["published"]["direct"][name] != out["own"]["direct"][name]
 
 
 BLOCKS = """
